@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free TV Sri Lanka - Cloudnextra Solutions</title>
+    <meta name="description" content="Watch Sri Lankan TV channels for free online. Stream Sirasa TV, Hiru TV, Derana TV, ITN, and more live channels.">
+    <meta name="keywords" content="free tv, sri lanka tv, live tv, sirasa tv, hiru tv, derana tv, online streaming">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6b35">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><i class="fas fa-tv"></i> Free TV Sri Lanka</h2>
+                <span class="brand-subtitle">by Cloudnextra Solutions</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#channels" class="nav-link">Channels</a>
+                <a href="#categories" class="nav-link">Categories</a>
+                <a href="#about" class="nav-link">About</a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Watch Sri Lankan TV Channels</h1>
+                <h2>Absolutely Free</h2>
+                <p>Stream your favorite Sri Lankan TV channels in HD quality. No registration required!</p>
+                <div class="hero-buttons">
+                    <a href="#channels" class="btn-primary">Start Watching</a>
+                    <a href="#about" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <h3>25+</h3>
+                    <p>TV Channels</p>
+                </div>
+                <div class="stat">
+                    <h3>24/7</h3>
+                    <p>Live Streaming</p>
+                </div>
+                <div class="stat">
+                    <h3>100%</h3>
+                    <p>Free</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Channels -->
+    <section id="featured" class="featured-channels">
+        <div class="container">
+            <h2>Featured Channels</h2>
+            <div class="channels-grid">
+                <div class="channel-card" data-channel="sirasa">
+                    <div class="channel-logo">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3>Sirasa TV</h3>
+                    <p>Entertainment & News</p>
+                    <button class="watch-btn">Watch Live</button>
+                </div>
+                <div class="channel-card" data-channel="hiru">
+                    <div class="channel-logo">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3>Hiru TV</h3>
+                    <p>News & Current Affairs</p>
+                    <button class="watch-btn">Watch Live</button>
+                </div>
+                <div class="channel-card" data-channel="derana">
+                    <div class="channel-logo">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3>Derana TV</h3>
+                    <p>Entertainment & Drama</p>
+                    <button class="watch-btn">Watch Live</button>
+                </div>
+                <div class="channel-card" data-channel="itn">
+                    <div class="channel-logo">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3>ITN</h3>
+                    <p>News & Information</p>
+                    <button class="watch-btn">Watch Live</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- All Channels Section -->
+    <section id="channels" class="all-channels">
+        <div class="container">
+            <h2>All Sri Lankan TV Channels</h2>
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="news">News</button>
+                <button class="filter-btn" data-category="entertainment">Entertainment</button>
+                <button class="filter-btn" data-category="sports">Sports</button>
+                <button class="filter-btn" data-category="kids">Kids</button>
+            </div>
+            <div class="channels-list" id="channelsList">
+                <!-- Channels will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalChannelName">Channel Name</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="video-container">
+                <video id="videoPlayer" controls>
+                    <source src="" type="application/x-mpegURL">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <h2>About Free TV Sri Lanka</h2>
+                <p>Welcome to Free TV Sri Lanka, brought to you by <strong>Cloudnextra Solutions</strong>. We provide free access to popular Sri Lankan television channels, allowing you to stay connected with local news, entertainment, and cultural content from anywhere in the world.</p>
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-globe"></i>
+                        <h3>Global Access</h3>
+                        <p>Watch Sri Lankan TV from anywhere in the world</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Mobile Friendly</h3>
+                        <p>Optimized for all devices - phone, tablet, desktop</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-hd-video"></i>
+                        <h3>HD Quality</h3>
+                        <p>High-definition streaming for the best viewing experience</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><i class="fas fa-tv"></i> Free TV Sri Lanka</h3>
+                    <p>Powered by Cloudnextra Solutions</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#channels">Channels</a></li>
+                        <li><a href="#categories">Categories</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-envelope"></i> info@cloudnextra.com</p>
+                    <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#disclaimer">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Cloudnextra Solutions. All rights reserved.</p>
+                <p>This is a free service providing access to publicly available streams.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
