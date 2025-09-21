@@ -19,6 +19,61 @@ body {
     padding: 0 20px;
 }
 
+/* Demo Banner */
+.demo-banner {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    padding: 12px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.demo-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+
+.demo-content i {
+    color: #ffd700;
+    font-size: 1.2rem;
+}
+
+.close-banner {
+    position: absolute;
+    right: 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.close-banner:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Adjust navbar position when banner is shown */
+body:not(.banner-closed) .navbar {
+    top: 48px;
+}
+
+body:not(.banner-closed) .hero {
+    padding-top: 120px;
+}
+
+body.banner-closed .demo-banner {
+    display: none;
+}
+
 /* Navigation */
 .navbar {
     position: fixed;
@@ -157,6 +212,17 @@ body {
     margin-left: auto;
     margin-right: auto;
     animation: fadeInUp 1s ease 0.4s both;
+}
+
+.demo-notice {
+    font-size: 1rem !important;
+    color: #ffd700 !important;
+    margin-bottom: 1rem !important;
+    font-weight: 500;
+}
+
+.demo-notice i {
+    margin-right: 8px;
 }
 
 .hero-buttons {
@@ -380,6 +446,16 @@ body {
     font-weight: 600;
 }
 
+.status-offline {
+    background: #ff4757 !important;
+    color: white !important;
+}
+
+.status-live {
+    background: #00ff88 !important;
+    color: #000 !important;
+}
+
 /* Video Modal */
 .modal {
     display: none;
@@ -416,6 +492,27 @@ body {
     font-size: 1.5rem;
 }
 
+.modal-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.control-btn {
+    background: transparent;
+    border: 2px solid #ff6b35;
+    color: #ff6b35;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background: #ff6b35;
+    color: white;
+}
+
 .close {
     color: #888;
     font-size: 2rem;
@@ -432,12 +529,103 @@ body {
     position: relative;
     width: 100%;
     height: 500px;
+    background: #000;
 }
 
 #videoPlayer {
     width: 100%;
     height: 100%;
     background: #000;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 10;
+}
+
+.loading-spinner i {
+    font-size: 3rem;
+    color: #ff6b35;
+    margin-bottom: 1rem;
+}
+
+.error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    z-index: 10;
+}
+
+.error-message i {
+    font-size: 3rem;
+    color: #ff4757;
+    margin-bottom: 1rem;
+}
+
+.retry-btn {
+    background: #ff6b35;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    background: #e55a2b;
+    transform: scale(1.05);
+}
+
+.stream-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #1a1a1a;
+    border-top: 1px solid #333;
+}
+
+.stream-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-live {
+    color: #00ff88;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+.quality-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+}
+
+.quality-selector select {
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 /* About Section */
@@ -644,4 +832,148 @@ body {
     .video-container {
         height: 250px;
     }
+}
+
+/* IPTV Stream Quality Indicators */
+.stream-quality {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.quality-hd {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+}
+
+.quality-sd {
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+}
+
+.quality-hls {
+    background: linear-gradient(45deg, #2196F3, #1976D2);
+}
+
+/* Stream Status Indicators */
+.stream-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+.status-live {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-offline {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.status-buffering {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Connection Quality Indicator */
+.connection-quality {
+    position: absolute;
+    bottom: 50px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px;
+    border-radius: 8px;
+    color: white;
+    font-size: 11px;
+}
+
+.signal-bars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 4px;
+}
+
+.signal-bar {
+    width: 3px;
+    background: #666;
+    border-radius: 1px;
+}
+
+.signal-bar.active {
+    background: #4CAF50;
+}
+
+.signal-bar:nth-child(1) { height: 6px; }
+.signal-bar:nth-child(2) { height: 9px; }
+.signal-bar:nth-child(3) { height: 12px; }
+.signal-bar:nth-child(4) { height: 15px; }
+
+/* IPTV Channel Cards Enhancement */
+.channel-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.channel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.channel-item:hover::before,
+.channel-item.live::before {
+    opacity: 1;
+}
+
+.channel-item.live .channel-status {
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+/* IPTV Technology Badge */
+.iptv-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
