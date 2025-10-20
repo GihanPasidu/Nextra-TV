@@ -7,11 +7,56 @@
     <meta name="description" content="Watch thousands of free live TV channels from around the world. Stream news, sports, entertainment, and more with Free TV by CloudNextra Solutions.">
     <meta name="keywords" content="free tv, live tv, iptv, streaming, online television, free channels">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap"></noscript>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
+    <style>
+        /* Critical CSS for fast initial render */
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        .preloader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #334155;
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
+    <!-- Preloader -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-spinner"></div>
+    </div>
     <header>
         <div class="container">
             <div class="header-left">
@@ -217,19 +262,22 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js" defer></script>
+    <script src="script.js" defer></script>
     <script>
-        // Fallback CDN for HLS.js if primary fails
-        if (typeof Hls === 'undefined') {
-            console.log('Primary HLS.js CDN failed, trying fallback...');
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
-            fallbackScript.onerror = function() {
-                console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
-            };
-            document.head.appendChild(fallbackScript);
-        }
+        // Preload critical resources
+        window.addEventListener('load', function() {
+            // Preload fallback HLS.js if needed
+            if (typeof Hls === 'undefined') {
+                console.log('Loading HLS.js fallback...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
+                fallbackScript.onerror = function() {
+                    console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
+                };
+                document.head.appendChild(fallbackScript);
+            }
+        });
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
