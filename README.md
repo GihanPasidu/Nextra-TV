@@ -1,184 +1,134 @@
-# Free TV Sri Lanka 📺
+# Free TV - Live Television Streaming
 
-A modern, responsive website for streaming Sri Lankan TV channels for free. Built by **Cloudnextra Solutions**.
+A modern, responsive web application for streaming live TV channels from around the world.
 
-## 🌟 Features
+**Created by CloudNextra Solutions**
 
-- **25+ Sri Lankan TV Channels** - Popular channels like Sirasa TV, Hiru TV, Derana TV, ITN, and more
-- **Responsive Design** - Works perfectly on desktop, tablet, and mobile devices
-- **Live Streaming** - Watch your favorite channels in real-time
-- **Category Filtering** - Filter channels by News, Entertainment, Sports, and Kids
-- **Modern UI/UX** - Beautiful gradient designs and smooth animations
-- **Mobile-First** - Optimized for mobile viewing experience
-- **Free Access** - No registration or subscription required
+## Features
 
-## 🚀 Live Demo
+- 🌍 Access to thousands of free live TV channels worldwide
+- 📺 Modern, intuitive user interface
+- 🔍 Advanced search and filtering capabilities
+- 📱 Fully responsive design (mobile, tablet, desktop)
+- 🎨 Beautiful dark theme with smooth animations
+- 🎯 Filter by category, country, and language
+- ▶️ Built-in video player with HLS support
+- 🚀 Fast and lightweight
 
-Visit the website: [Free TV Sri Lanka](https://your-domain.com)
+## Technologies Used
 
-## 📋 Available Channels
-
-### News Channels
-- Hiru TV
-- ITN
-- Ada Derana 24
-- Hiru News
-
-### Entertainment Channels
-- Sirasa TV
-- Derana TV
-- Rupavahini
-- TV Derana
-- Charana TV
-- Swarnavahini
-- Wasantham TV
-- Channel C
-- TNL TV
-- Supreme TV
-- And more...
-
-### Sports Channels
-- Lanka Sports Channel
-
-### Kids Channels
-- Zoom TV
-
-## 🛠️ Technologies Used
-
-- **HTML5** - Semantic markup and video support
-- **CSS3** - Modern styling with gradients, animations, and flexbox/grid
-- **JavaScript (ES6+)** - Interactive functionality and video player controls
-- **Font Awesome** - Beautiful icons
+- **HTML5** - Semantic markup
+- **CSS3** - Modern styling with CSS Grid and Flexbox
+- **JavaScript (ES6+)** - Dynamic functionality
+- **HLS.js** - HTTP Live Streaming support
+- **Font Awesome** - Icons
 - **Google Fonts** - Poppins font family
-- **Responsive Design** - Mobile-first approach
+- **IPTV-org API** - Channel data source
 
-## 📁 Project Structure
+## Data Source
+
+This project uses the [IPTV-org](https://github.com/iptv-org/iptv) project, which provides a collection of publicly available IPTV channels from around the world.
+
+## Getting Started
+
+1. **Clone or download this repository**
+
+2. **Open the project**
+   - Simply open `index.html` in a modern web browser
+   - No build process or server required!
+
+3. **Start watching**
+   - Browse channels by category
+   - Search for specific channels
+   - Filter by country or language
+   - Click any channel to start streaming
+
+## Project Structure
 
 ```
 free-tv/
-├── index.html              # Main HTML file
-├── assets/
-│   ├── css/
-│   │   └── style.css       # Main stylesheet
-│   ├── js/
-│   │   └── script.js       # JavaScript functionality
-│   └── images/             # Image assets
-├── README.md               # Project documentation
-└── .gitattributes         # Git configuration
+├── index.html          # Main HTML file
+├── styles.css          # All styling
+├── script.js           # Application logic
+└── README.md          # This file
 ```
 
-## 🔧 Setup Instructions
+## Features in Detail
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/GihanPasidu/free-tv.git
-   cd free-tv
-   ```
+### Search & Filter
+- Real-time search across channel names
+- Filter by category (News, Sports, Entertainment, etc.)
+- Filter by country
+- Filter by language
 
-2. **Open in browser**
-   - Simply open `index.html` in your web browser
-   - Or use a local server for better development experience:
-   ```bash
-   # Using Python
-   python -m http.server 8000
-   
-   # Using Node.js (http-server)
-   npx http-server
-   
-   # Using PHP
-   php -S localhost:8000
-   ```
+### Video Player
+- Supports HLS (m3u8) streams
+- Supports direct video streams
+- Automatic stream detection
+- Error handling for unavailable streams
+- Full-screen support
+- Responsive player controls
 
-3. **Access the website**
-   - Open `http://localhost:8000` in your browser
+### Responsive Design
+- Mobile-first approach
+- Adapts to all screen sizes
+- Touch-friendly interface
+- Optimized for performance
 
-## 🎯 Key Features Explained
+## Browser Support
 
-### Responsive Navigation
-- Mobile-friendly hamburger menu
-- Smooth scroll to sections
-- Active link highlighting
+- ✅ Chrome (recommended)
+- ✅ Firefox
+- ✅ Safari
+- ✅ Edge
+- ✅ Opera
 
-### Video Player Modal
-- Full-screen video player
-- Easy-to-use controls
-- Close with Escape key or click outside
+## Limitations
 
-### Channel Management
-- Dynamic channel loading
-- Category-based filtering
-- Search functionality (ready for implementation)
+- Stream availability depends on the IPTV-org database
+- Some streams may not work due to geo-restrictions
+- Stream quality varies by source
+- Requires internet connection
 
-### Modern Design
-- Gradient backgrounds
-- Smooth animations
-- Card-based layouts
-- Professional color scheme
+## Future Enhancements
 
-## 🔐 Stream Integration
+- [ ] Favorites/bookmarking system
+- [ ] Recently watched channels
+- [ ] Channel recommendations
+- [ ] EPG (Electronic Program Guide)
+- [ ] Multiple stream quality options
+- [ ] Chromecast support
+- [ ] User preferences/settings
 
-**Note for Developers:** The current implementation includes placeholder stream URLs. To integrate actual TV streams:
+## Contributing
 
-1. Replace the `streamUrl` values in `assets/js/script.js`
-2. Ensure you have proper licensing for the streams
-3. Consider using HLS (HTTP Live Streaming) for better compatibility
-4. Implement proper error handling for stream failures
-
-Example stream integration:
-```javascript
-{
-    name: "Sirasa TV",
-    streamUrl: "https://your-stream-provider.com/sirasa.m3u8",
-    // ... other properties
-}
-```
-
-## 📱 Browser Compatibility
-
-- ✅ Chrome 60+
-- ✅ Firefox 55+
-- ✅ Safari 11+
-- ✅ Edge 79+
-- ✅ Mobile browsers (iOS Safari, Chrome Mobile)
-
-## 🤝 Contributing
+This project was created by CloudNextra Solutions. If you'd like to contribute:
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## 📞 Contact & Support
+## License
 
-**Cloudnextra Solutions**
-- 📧 Email: info@cloudnextra.com
-- 📱 Phone: +94 11 234 5678
-- 📍 Location: Colombo, Sri Lanka
+This project is open source and available under the MIT License.
 
-## 📄 Legal Notice
+## Credits
 
-This website provides access to publicly available television streams. All content rights belong to their respective owners. This is a free service provided for educational and entertainment purposes.
+- **CloudNextra Solutions** - Development
+- **IPTV-org** - Channel data and streams
+- **Font Awesome** - Icons
+- **HLS.js** - Video streaming library
 
-## 🔮 Future Enhancements
+## Disclaimer
 
-- [ ] User favorites system
-- [ ] TV guide/schedule
-- [ ] Multiple video quality options
-- [ ] Chromecast support
-- [ ] User comments and ratings
-- [ ] Social media sharing
-- [ ] Live chat during streams
-- [ ] Multi-language support
+This application does not host any content. All streams are provided by third parties through the IPTV-org project. The availability and legality of streams may vary by region.
 
-## 📊 Performance
+## Contact
 
-- **Lighthouse Score:** 95+ (Performance, Accessibility, Best Practices, SEO)
-- **Mobile-Friendly:** ✅ Google Mobile-Friendly Test
-- **Loading Speed:** < 2 seconds on 3G networks
+For questions or support, please contact:
+- Email: info@cloudnextra.com
 
 ---
 
-**Built with ❤️ by Cloudnextra Solutions**
-
-*Bringing Sri Lankan television to the world, one stream at a time.*
+**© 2025 CloudNextra Solutions. All rights reserved.**

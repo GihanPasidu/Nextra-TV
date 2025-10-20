@@ -3,296 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free TV Sri Lanka - Cloudnextra Solutions</title>
-    <meta name="description" content="Watch Sri Lankan TV channels for free online. Stream Sirasa TV, Hiru TV, Derana TV, ITN, and more live channels.">
-    <meta name="keywords" content="free tv, sri lanka tv, live tv, sirasa tv, hiru tv, derana tv, online streaming">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff6b35">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>Free TV - Live Television Streaming | CloudNextra Solutions</title>
+    <meta name="description" content="Watch thousands of free live TV channels from around the world. Stream news, sports, entertainment, and more with Free TV by CloudNextra Solutions.">
+    <meta name="keywords" content="free tv, live tv, iptv, streaming, online television, free channels">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
 </head>
 <body>
-    <!-- Demo Notice Banner -->
-    <div class="demo-banner">
+    <header>
         <div class="container">
-            <div class="demo-content">
-                <i class="fas fa-satellite-dish"></i>
-                <span><strong>Global IPTV:</strong> Now featuring 40+ international channels including Sri Lankan content!</span>
-                <button id="closeBanner" class="close-banner">×</button>
+            <div class="header-left">
+                <div class="logo">
+                    <i class="fas fa-tv"></i>
+                    <div>
+                        <h1>Free TV</h1>
+                        <div class="tagline">by CloudNextra Solutions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="favoriteBtn" class="header-btn" title="My Favorites">
+                    <i class="fas fa-heart"></i>
+                    <span class="favorites-count">0</span>
+                </button>
+                <button id="themeToggle" class="header-btn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <h2><i class="fas fa-tv"></i> Free TV Sri Lanka</h2>
-                <span class="brand-subtitle">by Cloudnextra Solutions</span>
+    <nav class="main-nav">
+        <div class="container">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search channels by name...">
+                <button id="clearSearch" class="clear-search hidden">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="nav-menu">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#channels" class="nav-link">Channels</a>
-                <a href="#categories" class="nav-link">Categories</a>
-                <a href="#about" class="nav-link">About</a>
-            </div>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="filter-controls">
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="countryFilter">
+                    <option value="">All Countries</option>
+                </select>
+                <select id="languageFilter">
+                    <option value="">All Languages</option>
+                </select>
+                <button id="clearFilters" class="clear-filters-btn">
+                    <i class="fas fa-filter-circle-xmark"></i> Clear Filters
+                </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1>Watch Global TV Channels</h1>
-                <h2>Absolutely Free</h2>
-                <p>Stream international TV channels including Sri Lankan content in HD quality. No registration required!</p>
-                <p class="demo-notice"><i class="fas fa-satellite-dish"></i> Featuring global IPTV channels with news, entertainment, sports, and more</p>
-                <div class="hero-buttons">
-                    <a href="#channels" class="btn-primary">Start Watching</a>
-                    <a href="#about" class="btn-secondary">Learn More</a>
-                </div>
-            </div>
-            <div class="hero-stats">
-                <div class="stat">
-                    <h3>40+</h3>
-                    <p>TV Channels</p>
-                </div>
-                <div class="stat">
-                    <h3>24/7</h3>
-                    <p>Live Streaming</p>
-                </div>
-                <div class="stat">
-                    <h3>100%</h3>
-                    <p>Free</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Channels -->
-    <section id="featured" class="featured-channels">
+    <main>
         <div class="container">
-            <h2>Featured Channels</h2>
-            <div class="channels-grid">
-                <div class="channel-card" data-channel="sirasa">
-                    <div class="channel-logo">
-                        <i class="fas fa-play-circle"></i>
+            <div class="content-wrapper">
+                <!-- Sidebar for categories -->
+                <aside class="sidebar">
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-star"></i> Quick Access</h3>
+                        <ul class="quick-access-list">
+                            <li id="showAllChannels" class="active">
+                                <i class="fas fa-list"></i> All Channels
+                            </li>
+                            <li id="showFavorites">
+                                <i class="fas fa-heart"></i> Favorites
+                                <span class="badge">0</span>
+                            </li>
+                            <li id="showRecent">
+                                <i class="fas fa-history"></i> Recently Watched
+                            </li>
+                        </ul>
                     </div>
-                    <h3>Sirasa TV</h3>
-                    <p>Entertainment & News</p>
-                    <button class="watch-btn">Watch Live</button>
-                </div>
-                <div class="channel-card" data-channel="hiru">
-                    <div class="channel-logo">
-                        <i class="fas fa-play-circle"></i>
+                    
+                    <div class="sidebar-section">
+                        <h3><i class="fas fa-folder-open"></i> Categories</h3>
+                        <ul id="categoryList" class="category-list"></ul>
                     </div>
-                    <h3>Hiru TV</h3>
-                    <p>News & Current Affairs</p>
-                    <button class="watch-btn">Watch Live</button>
-                </div>
-                <div class="channel-card" data-channel="derana">
-                    <div class="channel-logo">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                    <h3>Derana TV</h3>
-                    <p>Entertainment & Drama</p>
-                    <button class="watch-btn">Watch Live</button>
-                </div>
-                <div class="channel-card" data-channel="itn">
-                    <div class="channel-logo">
-                        <i class="fas fa-play-circle"></i>
-                    </div>
-                    <h3>ITN</h3>
-                    <p>News & Information</p>
-                    <button class="watch-btn">Watch Live</button>
-                </div>
-            </div>
-        </div>
-    </section>
+                </aside>
 
-    <!-- All Channels Section -->
-    <section id="channels" class="all-channels">
-        <div class="container">
-            <h2>Global IPTV Channels</h2>
-            <div class="category-filter">
-                <button class="filter-btn active" data-category="all">All</button>
-                <button class="filter-btn" data-category="news">News</button>
-                <button class="filter-btn" data-category="entertainment">Entertainment</button>
-                <button class="filter-btn" data-category="sports">Sports</button>
-                <button class="filter-btn" data-category="music">Music</button>
-                <button class="filter-btn" data-category="kids">Kids</button>
-            </div>
-            <div class="channels-list" id="channelsList">
-                <!-- Channels will be populated by JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Video Player Modal -->
-    <div id="videoModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalChannelName">Channel Name</h3>
-                <div class="modal-controls">
-                    <button id="fullscreenBtn" class="control-btn"><i class="fas fa-expand"></i></button>
-                    <span class="close">&times;</span>
-                </div>
-            </div>
-            <div class="video-container">
-                <!-- IPTV Information Overlay -->
-                <div class="iptv-controls">
-                    <div class="iptv-info stream-protocol">
-                        <i class="fas fa-satellite-dish"></i>
-                        <span id="streamProtocol">HLS</span>
+                <!-- Main content area -->
+                <div class="main-content">
+                    <!-- Video player -->
+                    <div id="playerContainer" class="player-container hidden">
+                        <div class="player-header">
+                            <div class="player-title-section">
+                                <h2 id="currentChannelName">Select a channel to start watching</h2>
+                                <button id="favoriteCurrentChannel" class="favorite-btn" title="Add to favorites">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="player-controls-header">
+                                <button id="pictureInPicture" class="player-control-btn" title="Picture in Picture">
+                                    <i class="fas fa-compress-arrows-alt"></i>
+                                </button>
+                                <button id="fullscreenBtn" class="player-control-btn" title="Fullscreen">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                                <button id="closePlayer" class="close-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="video-wrapper">
+                            <video id="videoPlayer" controls autoplay playsinline>
+                                Your browser does not support the video tag.
+                            </video>
+                            <div id="playerError" class="player-error hidden">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>Unable to load this channel. Please try another one.</p>
+                                <button id="retryStream" class="retry-btn">
+                                    <i class="fas fa-redo"></i> Try Again
+                                </button>
+                            </div>
+                            <div id="loadingOverlay" class="loading-overlay hidden">
+                                <div class="spinner"></div>
+                                <p>Loading stream...</p>
+                            </div>
+                        </div>
+                        <div class="player-info">
+                            <div class="info-tags" id="channelInfo"></div>
+                            <div class="stream-quality">
+                                <label><i class="fas fa-signal"></i> Quality:</label>
+                                <select id="streamQuality">
+                                    <option value="0">Auto</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="iptv-info stream-latency">
-                        <i class="fas fa-clock"></i>
-                        <span id="streamLatency">~3s</span>
-                    </div>
-                    <div class="iptv-info stream-bitrate">
-                        <i class="fas fa-signal"></i>
-                        <span id="streamBitrate">Auto</span>
-                    </div>
-                </div>
 
-                <!-- Stream Quality Badge -->
-                <div class="stream-quality quality-hls" id="qualityBadge">
-                    HLS
-                </div>
-
-                <!-- Connection Quality Indicator -->
-                <div class="connection-quality" id="connectionQuality">
-                    <div class="signal-bars">
-                        <div class="signal-bar"></div>
-                        <div class="signal-bar"></div>
-                        <div class="signal-bar"></div>
-                        <div class="signal-bar"></div>
+                    <!-- Channel grid -->
+                    <div class="channels-header">
+                        <div class="header-title">
+                            <h2 id="sectionTitle">Available Channels</h2>
+                            <p id="sectionSubtitle" class="section-subtitle"></p>
+                        </div>
+                        <div class="header-actions">
+                            <div class="sort-control">
+                                <label><i class="fas fa-sort"></i></label>
+                                <select id="sortBy">
+                                    <option value="name-asc">A-Z</option>
+                                    <option value="name-desc">Z-A</option>
+                                    <option value="country-asc">Country A-Z</option>
+                                    <option value="recent">Recently Added</option>
+                                </select>
+                            </div>
+                            <span id="channelCount" class="channel-count">Loading...</span>
+                        </div>
                     </div>
-                    <span id="connectionText">Excellent</span>
-                </div>
-
-                <video id="videoPlayer" controls playsinline>
-                    Your browser does not support the video tag.
-                </video>
-                
-                <!-- Buffer Status Bar -->
-                <div class="buffer-status" id="bufferStatus">
-                    <div class="buffer-progress" id="bufferProgress"></div>
-                </div>
-
-                <div id="loadingSpinner" class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Connecting to IPTV stream...</p>
-                </div>
-                <div id="errorMessage" class="error-message" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>IPTV stream unavailable. Trying backup server...</p>
-                    <button id="retryBtn" class="retry-btn">Retry</button>
-                </div>
-            </div>
-            <div class="stream-info">
-                <div class="stream-status">
-                    <span id="streamStatus" class="status-live status-pulse">● LIVE IPTV</span>
-                    <span id="viewerCount" class="stream-status-indicator status-live">
-                        <i class="fas fa-users"></i>
-                        <span>Loading...</span>
-                    </span>
-                </div>
-                <div class="quality-selector">
-                    <label>Quality:</label>
-                    <select id="qualitySelect">
-                        <option value="auto">Auto</option>
-                        <option value="720p">720p HD</option>
-                        <option value="480p">480p</option>
-                        <option value="360p">360p</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="about-content">
-                <h2>About Free TV Sri Lanka</h2>
-                <p>Welcome to Free TV Sri Lanka, brought to you by <strong>Cloudnextra Solutions</strong>. We provide free access to popular Sri Lankan television channels, allowing you to stay connected with local news, entertainment, and cultural content from anywhere in the world.</p>
-                <div class="features">
-                    <div class="feature">
-                        <i class="fas fa-globe"></i>
-                        <h3>Global Access</h3>
-                        <p>Watch Sri Lankan TV from anywhere in the world</p>
+                    
+                    <div id="loadingSpinner" class="loading-spinner">
+                        <div class="spinner-large"></div>
+                        <p>Loading channels...</p>
+                        <small>Please wait while we fetch the latest channels</small>
                     </div>
-                    <div class="feature">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>Mobile Friendly</h3>
-                        <p>Optimized for all devices - phone, tablet, desktop</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-hd-video"></i>
-                        <h3>HD Quality</h3>
-                        <p>High-definition streaming for the best viewing experience</p>
+
+                    <div id="channelGrid" class="channel-grid"></div>
+
+                    <div id="noResults" class="no-results hidden">
+                        <i class="fas fa-search"></i>
+                        <h3>No channels found</h3>
+                        <p>Try adjusting your search or filter criteria</p>
+                        <button id="resetFiltersBtn" class="reset-btn">
+                            <i class="fas fa-redo"></i> Reset All Filters
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3><i class="fas fa-tv"></i> Free TV Sri Lanka</h3>
-                    <p>Powered by Cloudnextra Solutions</p>
+                    <h3>About Free TV</h3>
+                    <p>Your free source for live television streaming from around the world.</p>
+                    <p class="copyright">&copy; 2025 CloudNextra Solutions. All rights reserved.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Information</h3>
+                    <p>Channels provided by <a href="https://github.com/iptv-org/iptv" target="_blank">IPTV-org</a></p>
+                    <p>Open source project for free and legal IPTV channels</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-envelope"></i> info@cloudnextra.com</p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#channels">Channels</a></li>
-                        <li><a href="#categories">Categories</a></li>
-                        <li><a href="#about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <p><i class="fas fa-envelope"></i> info@cloudnextra.com</p>
-                    <p><i class="fas fa-phone"></i> +94 11 234 5678</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Colombo, Sri Lanka</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#privacy">Privacy Policy</a></li>
-                        <li><a href="#terms">Terms of Service</a></li>
-                        <li><a href="#disclaimer">Disclaimer</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Cloudnextra Solutions. All rights reserved.</p>
-                <p>This is a free service providing access to publicly available streams.</p>
             </div>
         </div>
     </footer>
 
-    <script src="assets/js/script.js"></script>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">
+        <i class="toast-icon"></i>
+        <span class="toast-message"></span>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="script.js"></script>
 </body>
 </html>
