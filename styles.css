@@ -150,7 +150,7 @@ header .container {
     padding: 20px 0;
     border-bottom: 1px solid var(--border-color);
     position: sticky;
-    top: 80px;
+    top: 88px;
     z-index: 100;
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-sm);
@@ -283,7 +283,7 @@ main {
     padding: 0;
     height: fit-content;
     position: sticky;
-    top: 180px;
+    top: 200px;
     border: 1px solid var(--border-color);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
@@ -822,18 +822,28 @@ main {
     justify-content: center;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: var(--transition-normal);
+    transition: all var(--transition-normal);
     z-index: 5;
+    opacity: 0.8;
 }
 
 .favorite-icon:hover {
     background: var(--favorite-color);
     transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
 }
 
 .favorite-icon.active {
     background: var(--favorite-color);
     color: white;
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+}
+
+.favorite-icon.active:hover {
+    transform: scale(1.2);
 }
 
 /* Loading spinner */
@@ -1119,7 +1129,7 @@ footer {
     }
 
     .main-nav {
-        top: 80px;
+        top: 88px;
     }
 }
 
@@ -1146,7 +1156,7 @@ footer {
     }
 
     .main-nav {
-        top: 70px;
+        top: 78px;
     }
 
     .main-nav .container {

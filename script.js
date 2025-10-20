@@ -52,13 +52,24 @@ const toast = document.getElementById('toast');
 // Initialize the application
 async function init() {
     try {
+        // Check if HLS.js is available
+        if (typeof Hls === 'undefined') {
+            console.warn('HLS.js not loaded. Some video streams may not work.');
+            showToast('Video streaming library loading...', 'info');
+        }
+        
         showLoading(true);
         await loadChannelsAndStreams();
         setupEventListeners();
         loadTheme();
-        renderChannels();
+        updateView(); // Initialize with proper view
         updateFavoritesCount();
         showLoading(false);
+        
+        // Set initial section subtitle
+        if (sectionSubtitle) {
+            sectionSubtitle.textContent = 'Browse all live TV channels from around the world';
+        }
     } catch (error) {
         console.error('Error initializing app:', error);
         showToast('Failed to load channels. Please refresh the page.', 'error');
@@ -140,7 +151,8 @@ function populateSelect(selectElement, options) {
 // Setup event listeners
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
-        debounce(filterChannels, 300)();
+        const debouncedFilter = debounce(filterChannels, 300);
+        debouncedFilter();
         clearSearch.classList.toggle('hidden', !searchInput.value);
     });
     
@@ -164,6 +176,12 @@ function setupEventListeners() {
     });
     
     favoriteBtn.addEventListener('click', () => {
+        // Add visual feedback
+        favoriteBtn.style.animation = 'heartBeat 0.3s ease';
+        setTimeout(() => {
+            favoriteBtn.style.animation = '';
+        }, 300);
+        
         currentView = 'favorites';
         updateView();
     });
@@ -211,17 +229,23 @@ function updateView() {
     if (currentView === 'all') {
         showAllChannels.classList.add('active');
         sectionTitle.textContent = 'Available Channels';
-        sectionSubtitle.textContent = 'Browse all live TV channels from around the world';
+        if (sectionSubtitle) {
+            sectionSubtitle.textContent = 'Browse all live TV channels from around the world';
+        }
         filteredChannels = [...allChannels];
     } else if (currentView === 'favorites') {
         showFavorites.classList.add('active');
         sectionTitle.textContent = 'My Favorites';
-        sectionSubtitle.textContent = 'Your favorite channels in one place';
+        if (sectionSubtitle) {
+            sectionSubtitle.textContent = 'Your favorite channels in one place';
+        }
         filteredChannels = allChannels.filter(ch => favorites.includes(ch.id));
     } else if (currentView === 'recent') {
         showRecent.classList.add('active');
         sectionTitle.textContent = 'Recently Watched';
-        sectionSubtitle.textContent = 'Continue where you left off';
+        if (sectionSubtitle) {
+            sectionSubtitle.textContent = 'Continue where you left off';
+        }
         filteredChannels = allChannels.filter(ch => recentlyWatched.includes(ch.id))
             .sort((a, b) => recentlyWatched.indexOf(a.id) - recentlyWatched.indexOf(b.id));
     }
@@ -314,6 +338,7 @@ function renderChannels() {
 function createChannelCard(channel) {
     const card = document.createElement('div');
     card.className = 'channel-card';
+    card.setAttribute('data-channel-id', channel.id);
     
     const logoDiv = document.createElement('div');
     logoDiv.className = 'channel-logo';
@@ -327,9 +352,23 @@ function createChannelCard(channel) {
     favBtn.innerHTML = favorites.includes(channel.id) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
     favBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        
+        // Add heartbeat animation
+        favBtn.style.animation = 'heartBeat 0.3s ease';
+        setTimeout(() => {
+            favBtn.style.animation = '';
+        }, 300);
+        
         toggleFavorite(channel.id);
-        favBtn.classList.toggle('active');
-        favBtn.innerHTML = favorites.includes(channel.id) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+        
+        // Update the button state based on the current favorites array
+        if (favorites.includes(channel.id)) {
+            favBtn.classList.add('active');
+            favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            favBtn.classList.remove('active');
+            favBtn.innerHTML = '<i class="far fa-heart"></i>';
+        }
     });
     
     if (channel.logo) {
@@ -394,12 +433,17 @@ function createChannelCard(channel) {
 function getCountryFlag(countryCode) {
     if (!countryCode || countryCode.length !== 2) return '🌐';
     
-    const codePoints = countryCode
-        .toUpperCase()
-        .split('')
-        .map(char => 127397 + char.charCodeAt());
-    
-    return String.fromCodePoint(...codePoints);
+    try {
+        const codePoints = countryCode
+            .toUpperCase()
+            .split('')
+            .map(char => 127397 + char.charCodeAt());
+        
+        return String.fromCodePoint(...codePoints);
+    } catch (error) {
+        console.log('Flag error for country code:', countryCode);
+        return '🌐';
+    }
 }
 
 // Toggle favorite
@@ -415,9 +459,45 @@ function toggleFavorite(channelId) {
     localStorage.setItem('favorites', JSON.stringify(favorites));
     updateFavoritesCount();
     
+    // Update all favorite icons for this channel
+    updateAllFavoriteIcons(channelId);
+    
     // Update current view if in favorites mode
     if (currentView === 'favorites') {
         updateView();
+    }
+}
+
+// Update all favorite icons for a specific channel
+function updateAllFavoriteIcons(channelId) {
+    const isFavorite = favorites.includes(channelId);
+    
+    // Update all channel card favorite buttons
+    document.querySelectorAll('.channel-card').forEach(card => {
+        const cardChannelId = card.getAttribute('data-channel-id');
+        if (cardChannelId === channelId) {
+            const favBtn = card.querySelector('.favorite-icon');
+            if (favBtn) {
+                if (isFavorite) {
+                    favBtn.classList.add('active');
+                    favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                } else {
+                    favBtn.classList.remove('active');
+                    favBtn.innerHTML = '<i class="far fa-heart"></i>';
+                }
+            }
+        }
+    });
+    
+    // Update current channel favorite button if it's the same channel
+    if (currentChannel && currentChannel.id === channelId && favoriteCurrentChannel) {
+        if (isFavorite) {
+            favoriteCurrentChannel.classList.add('active');
+            favoriteCurrentChannel.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            favoriteCurrentChannel.classList.remove('active');
+            favoriteCurrentChannel.innerHTML = '<i class="far fa-heart"></i>';
+        }
     }
 }
 
@@ -425,22 +505,50 @@ function toggleFavorite(channelId) {
 function toggleCurrentChannelFavorite() {
     if (!currentChannel) return;
     
+    // Add heartbeat animation
+    if (favoriteCurrentChannel) {
+        favoriteCurrentChannel.style.animation = 'heartBeat 0.3s ease';
+        setTimeout(() => {
+            favoriteCurrentChannel.style.animation = '';
+        }, 300);
+    }
+    
     toggleFavorite(currentChannel.id);
     
-    if (favorites.includes(currentChannel.id)) {
-        favoriteCurrentChannel.classList.add('active');
-        favoriteCurrentChannel.innerHTML = '<i class="fas fa-heart"></i>';
-    } else {
-        favoriteCurrentChannel.classList.remove('active');
-        favoriteCurrentChannel.innerHTML = '<i class="far fa-heart"></i>';
+    if (favoriteCurrentChannel) {
+        if (favorites.includes(currentChannel.id)) {
+            favoriteCurrentChannel.classList.add('active');
+            favoriteCurrentChannel.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            favoriteCurrentChannel.classList.remove('active');
+            favoriteCurrentChannel.innerHTML = '<i class="far fa-heart"></i>';
+        }
     }
 }
 
 // Update favorites count
 function updateFavoritesCount() {
     const count = favorites.length;
-    document.querySelector('.favorites-count').textContent = count;
-    document.querySelector('.badge').textContent = count;
+    
+    // Update header favorites count
+    const favCountElement = document.querySelector('.favorites-count');
+    if (favCountElement) {
+        favCountElement.textContent = count;
+    }
+    
+    // Update sidebar badge
+    const badgeElement = document.querySelector('#showFavorites .badge');
+    if (badgeElement) {
+        badgeElement.textContent = count;
+    }
+    
+    // Update any other favorite counters
+    const allBadges = document.querySelectorAll('.badge');
+    allBadges.forEach(badge => {
+        if (badge.closest('#showFavorites')) {
+            badge.textContent = count;
+        }
+    });
 }
 
 // Add to recently watched
@@ -521,7 +629,7 @@ function loadStream(url) {
 
     if (url.includes('.m3u8')) {
         // HLS stream
-        if (Hls.isSupported()) {
+        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
             currentPlayer = new Hls({
                 enableWorker: true,
                 lowLatencyMode: true,
@@ -561,8 +669,17 @@ function loadStream(url) {
                 showPlayerError();
             });
         } else {
-            loadingOverlay.classList.add('hidden');
-            showPlayerError();
+            // HLS.js not available, try direct playback anyway
+            console.warn('HLS.js not available, attempting direct playback');
+            videoPlayer.src = url;
+            videoPlayer.addEventListener('loadeddata', () => {
+                loadingOverlay.classList.add('hidden');
+            });
+            videoPlayer.play().catch(err => {
+                console.error('Error playing video (HLS.js unavailable):', err);
+                loadingOverlay.classList.add('hidden');
+                showPlayerError();
+            });
         }
     } else {
         // Direct stream
@@ -655,7 +772,9 @@ function toggleFullscreen() {
 function toggleTheme() {
     document.body.classList.toggle('light-theme');
     const isLight = document.body.classList.contains('light-theme');
-    themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    if (themeToggle) {
+        themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    }
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
@@ -664,7 +783,13 @@ function loadTheme() {
     const theme = localStorage.getItem('theme') || 'dark';
     if (theme === 'light') {
         document.body.classList.add('light-theme');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        if (themeToggle) {
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+    } else {
+        if (themeToggle) {
+            themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        }
     }
 }
 
@@ -686,8 +811,12 @@ function showLoading(show) {
 
 // Show toast notification
 function showToast(message, type = 'info') {
+    if (!toast) return;
+    
     const toastIcon = toast.querySelector('.toast-icon');
     const toastMessage = toast.querySelector('.toast-message');
+    
+    if (!toastIcon || !toastMessage) return;
     
     toast.className = `toast ${type}`;
     toastMessage.textContent = message;

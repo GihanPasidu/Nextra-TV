@@ -4,16 +4,21 @@ A modern, responsive web application for streaming live TV channels from around 
 
 **Created by CloudNextra Solutions**
 
-## Features
+## ✨ Features
 
 - 🌍 Access to thousands of free live TV channels worldwide
-- 📺 Modern, intuitive user interface
+- 📺 Modern, intuitive user interface with professional design
 - 🔍 Advanced search and filtering capabilities
 - 📱 Fully responsive design (mobile, tablet, desktop)
-- 🎨 Beautiful dark theme with smooth animations
+- 🎨 Beautiful dark/light theme with smooth animations
+- ⭐ Favorites system with persistent storage
+- 🕒 Recently watched channels tracking
 - 🎯 Filter by category, country, and language
 - ▶️ Built-in video player with HLS support
-- 🚀 Fast and lightweight
+- 📺 Picture-in-Picture and Fullscreen support
+- 🔊 Stream quality selector
+- 📢 Toast notifications for user feedback
+- 🚀 Fast and lightweight with lazy loading
 
 ## Technologies Used
 
@@ -31,17 +36,40 @@ This project uses the [IPTV-org](https://github.com/iptv-org/iptv) project, whic
 
 ## Getting Started
 
+### 🚀 Quick Start (Recommended)
+
+**Option 1: Local Server (Recommended for full functionality)**
+1. **Windows Users**: Double-click `start-server.bat`
+2. **All Users**: Run `python serve.py` in the project directory
+3. Open `http://localhost:8000` in your browser
+4. Enjoy full functionality including API calls and heart animations!
+
+**Option 2: Direct File Access**
 1. **Clone or download this repository**
+2. **Open the project**: Simply open `index.html` in a modern web browser
+3. **Start watching**: Browse channels, search, and enjoy!
 
-2. **Open the project**
-   - Simply open `index.html` in a modern web browser
-   - No build process or server required!
+> 💡 **Note**: The local server method ensures all features work correctly, including API calls to IPTV-org
 
-3. **Start watching**
-   - Browse channels by category
-   - Search for specific channels
-   - Filter by country or language
-   - Click any channel to start streaming
+### 🧪 Testing
+
+- Open `heart-test.html` to test heart functionality and animations
+- Use the server method for comprehensive testing
+- All heart features should work smoothly with proper animations
+
+### 🛠️ Troubleshooting
+
+**If hearts/favorites aren't working:**
+1. Ensure JavaScript is enabled in your browser
+2. Check browser console for any errors (F12)
+3. Try using the local server method instead of direct file access
+4. Clear browser cache and localStorage
+
+**If IPTV streams aren't loading:**
+1. Check your internet connection
+2. Some streams may be geo-restricted
+3. Try different channels from various countries
+4. Use the local server for better API access
 
 ## Project Structure
 
@@ -55,25 +83,44 @@ free-tv/
 
 ## Features in Detail
 
-### Search & Filter
-- Real-time search across channel names
+### 🔍 Advanced Search & Filtering
+- Real-time search across channel names and alternative names
 - Filter by category (News, Sports, Entertainment, etc.)
-- Filter by country
+- Filter by country with flag display
 - Filter by language
+- Sort channels alphabetically or by country
+- Clear all filters with one click
 
-### Video Player
-- Supports HLS (m3u8) streams
+### 📺 Professional Video Player
+- Supports HLS (m3u8) streams with quality selection
 - Supports direct video streams
-- Automatic stream detection
-- Error handling for unavailable streams
-- Full-screen support
-- Responsive player controls
+- Picture-in-Picture mode support
+- Fullscreen mode with keyboard shortcuts
+- Automatic stream detection and error recovery
+- Loading overlays and retry functionality
+- Stream quality selector for HLS streams
 
-### Responsive Design
+### ⭐ Favorites & History
+- Add/remove channels from favorites
+- Persistent favorites storage
+- Recently watched channels tracking
+- Quick access sidebar for favorites and recent
+- Favorites counter in header
+
+### 🎨 Theme & Design
+- Dark and light theme toggle
+- Professional gradient design
+- Smooth animations and transitions
+- Card hover effects with depth
+- Professional loading states
+- Toast notifications for user feedback
+
+### 📱 Responsive Design
 - Mobile-first approach
 - Adapts to all screen sizes
 - Touch-friendly interface
-- Optimized for performance
+- Optimized performance with lazy loading
+- Scroll-to-top functionality
 
 ## Browser Support
 
@@ -90,15 +137,26 @@ free-tv/
 - Stream quality varies by source
 - Requires internet connection
 
-## Future Enhancements
+## ✅ Current Features
 
-- [ ] Favorites/bookmarking system
-- [ ] Recently watched channels
-- [ ] Channel recommendations
-- [ ] EPG (Electronic Program Guide)
-- [ ] Multiple stream quality options
+- [x] Favorites/bookmarking system
+- [x] Recently watched channels
+- [x] Multiple stream quality options
+- [x] User preferences/settings with theme toggle
+- [x] Advanced search and filtering
+- [x] Picture-in-Picture support
+- [x] Fullscreen video player
+- [x] Toast notifications
+
+## 🚀 Future Enhancements
+
+- [ ] Channel recommendations based on viewing history
+- [ ] EPG (Electronic Program Guide) integration
 - [ ] Chromecast support
-- [ ] User preferences/settings
+- [ ] Keyboard shortcuts for player controls
+- [ ] Export/import favorites
+- [ ] Channel rating system
+- [ ] Multi-language interface
 
 ## Contributing
 
