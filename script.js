@@ -48,66 +48,203 @@ const fullscreenBtn = document.getElementById('fullscreenBtn');
 const streamQuality = document.getElementById('streamQuality');
 const scrollToTop = document.getElementById('scrollToTop');
 const toast = document.getElementById('toast');
+const preloader = document.getElementById('preloader');
 
-// Initialize the application
+// Initialize the application with performance optimizations
 async function init() {
+    const startTime = performance.now();
+    
+    // Mark content as loading
+    document.body.classList.remove('content-loaded');
+    
     try {
-        // Check if HLS.js is available
-        if (typeof Hls === 'undefined') {
-            console.warn('HLS.js not loaded. Some video streams may not work.');
-            showToast('Video streaming library loading...', 'info');
-        }
+        // Check if HLS.js is available (with retry for deferred loading)
+        let hlsRetries = 0;
+        const checkHLS = () => {
+            if (typeof Hls === 'undefined' && hlsRetries < 10) {
+                hlsRetries++;
+                setTimeout(checkHLS, 100);
+                return;
+            }
+            if (typeof Hls === 'undefined') {
+                console.warn('HLS.js not loaded after retries. Some video streams may not work.');
+                showToast('Video streaming library loading...', 'info');
+            }
+        };
+        checkHLS();
         
         showLoading(true);
-        await loadChannelsAndStreams();
+        
+        // Load data with timeout to prevent hanging
+        const loadingPromise = loadChannelsAndStreams();
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Loading timeout')), 15000)
+        );
+        
+        await Promise.race([loadingPromise, timeoutPromise]);
+        
         setupEventListeners();
         loadTheme();
+        loadUserPreferences(); // Load saved user preferences
         updateView(); // Initialize with proper view
         updateFavoritesCount();
         showLoading(false);
+        
+        // Mark content as loaded for CSS transitions
+        document.body.classList.add('content-loaded');
+        
+        // Hide preloader with faster transition
+        setTimeout(() => {
+            if (preloader) {
+                preloader.classList.add('fade-out');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 300);
+            }
+        }, 200);
         
         // Set initial section subtitle
         if (sectionSubtitle) {
             sectionSubtitle.textContent = 'Browse all live TV channels from around the world';
         }
+        
+        // Log performance
+        const loadTime = Math.round(performance.now() - startTime);
+        console.log(`✅ Free TV initialized in ${loadTime}ms`);
+        
+        // Show welcome message for first-time users (delayed to not interfere with loading)
+        if (!userPreferences.load('hasVisited')) {
+            setTimeout(() => {
+                showToast('Welcome to Free TV! Press ? for keyboard shortcuts.', 'info', 4000);
+                userPreferences.save('hasVisited', true);
+            }, 2000);
+        }
     } catch (error) {
         console.error('Error initializing app:', error);
         showToast('Failed to load channels. Please refresh the page.', 'error');
         showLoading(false);
+        
+        // Hide preloader even on error
+        if (preloader) {
+            preloader.classList.add('fade-out');
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 300);
+        }
     }
 }
 
-// Load channels and streams data
-async function loadChannelsAndStreams() {
+// Load channels and streams data with caching and optimization
+async function loadChannelsAndStreams(retryCount = 0) {
+    const maxRetries = 2; // Reduced retries for faster loading
+    const retryDelay = 500 * (retryCount + 1); // Faster retry delays
+    
+    // Check for cached data first
+    const cacheKey = 'freetv_channels_cache';
+    const cacheTimeKey = 'freetv_cache_time';
+    const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes cache
+    
+    const cachedTime = userPreferences.load(cacheTimeKey, 0);
+    const now = Date.now();
+    
+    if (now - cachedTime < CACHE_DURATION) {
+        const cachedData = userPreferences.load(cacheKey);
+        if (cachedData && Array.isArray(cachedData) && cachedData.length > 0) {
+            console.log('✅ Using cached channel data');
+            allChannels = cachedData;
+            filteredChannels = [...allChannels];
+            populateFilters();
+            updateChannelCount();
+            return;
+        }
+    }
+    
     try {
-        const [channelsResponse, streamsResponse] = await Promise.all([
-            fetch(CHANNELS_API),
-            fetch(STREAMS_API)
+        // Use Promise.allSettled for better error handling
+        const [channelsResult, streamsResult] = await Promise.allSettled([
+            fetch(CHANNELS_API, { 
+                cache: 'default',
+                headers: { 'Accept': 'application/json' }
+            }),
+            fetch(STREAMS_API, { 
+                cache: 'default',
+                headers: { 'Accept': 'application/json' }
+            })
         ]);
 
-        if (!channelsResponse.ok || !streamsResponse.ok) {
-            throw new Error('Failed to fetch data');
+        let channelsResponse, streamsResponse;
+        
+        if (channelsResult.status === 'fulfilled' && channelsResult.value.ok) {
+            channelsResponse = channelsResult.value;
+        } else {
+            throw new Error(`Channels API failed: ${channelsResult.reason || 'Unknown error'}`);
+        }
+        
+        if (streamsResult.status === 'fulfilled' && streamsResult.value.ok) {
+            streamsResponse = streamsResult.value;
+        } else {
+            throw new Error(`Streams API failed: ${streamsResult.reason || 'Unknown error'}`);
         }
 
-        allChannels = await channelsResponse.json();
-        allStreams = await streamsResponse.json();
+        // Parse JSON in parallel
+        const [channels, streams] = await Promise.all([
+            channelsResponse.json(),
+            streamsResponse.json()
+        ]);
 
-        // Merge channels with their streams
-        allChannels = allChannels.map(channel => {
-            const channelStreams = allStreams.filter(stream => stream.channel === channel.id);
-            return {
-                ...channel,
-                streams: channelStreams
-            };
-        }).filter(channel => channel.streams && channel.streams.length > 0);
+        // Validate data
+        if (!Array.isArray(channels) || !Array.isArray(streams)) {
+            throw new Error('Invalid data format received');
+        }
+
+        // Optimize data processing - only include channels with streams
+        allChannels = channels.reduce((acc, channel) => {
+            const channelStreams = streams.filter(stream => stream.channel === channel.id);
+            if (channelStreams.length > 0) {
+                acc.push({
+                    ...channel,
+                    streams: channelStreams.slice(0, 3) // Limit streams per channel for performance
+                });
+            }
+            return acc;
+        }, []);
 
         filteredChannels = [...allChannels];
         
+        // Cache the processed data
+        userPreferences.save(cacheKey, allChannels);
+        userPreferences.save(cacheTimeKey, now);
+        
+        // Populate filters with the loaded data
         populateFilters();
         updateChannelCount();
+        
+        console.log(`✅ Loaded ${allChannels.length} channels with streams (${channels.length} total channels processed)`);
     } catch (error) {
         console.error('Error loading data:', error);
-        throw error;
+        
+        if (retryCount < maxRetries) {
+            console.log(`Retrying in ${retryDelay}ms... (${retryCount + 1}/${maxRetries})`);
+            showToast(`Connection failed. Retrying... (${retryCount + 1}/${maxRetries})`, 'warning', 1500);
+            
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            return loadChannelsAndStreams(retryCount + 1);
+        } else {
+            // Try to use old cached data as fallback
+            const fallbackData = userPreferences.load(cacheKey);
+            if (fallbackData && Array.isArray(fallbackData) && fallbackData.length > 0) {
+                console.log('Using stale cached data as fallback');
+                allChannels = fallbackData;
+                filteredChannels = [...allChannels];
+                populateFilters();
+                updateChannelCount();
+                showToast('Using cached data. Some channels may be outdated.', 'warning');
+                return;
+            }
+            
+            showToast('Failed to load channels. Please check your internet connection and refresh.', 'error');
+            throw error;
+        }
     }
 }
 
@@ -162,10 +299,22 @@ function setupEventListeners() {
         filterChannels();
     });
     
-    categoryFilter.addEventListener('change', filterChannels);
-    countryFilter.addEventListener('change', filterChannels);
-    languageFilter.addEventListener('change', filterChannels);
-    sortBy.addEventListener('change', filterChannels);
+    categoryFilter.addEventListener('change', () => {
+        filterChannels();
+        saveCurrentFilters();
+    });
+    countryFilter.addEventListener('change', () => {
+        filterChannels();
+        saveCurrentFilters();
+    });
+    languageFilter.addEventListener('change', () => {
+        filterChannels();
+        saveCurrentFilters();
+    });
+    sortBy.addEventListener('change', () => {
+        filterChannels();
+        saveCurrentFilters();
+    });
     
     clearFiltersBtn.addEventListener('click', clearAllFilters);
     resetFiltersBtn.addEventListener('click', clearAllFilters);
@@ -207,6 +356,13 @@ function setupEventListeners() {
     pictureInPicture.addEventListener('click', togglePictureInPicture);
     fullscreenBtn.addEventListener('click', toggleFullscreen);
     
+    // Save volume when it changes
+    videoPlayer.addEventListener('volumechange', () => {
+        if (!videoPlayer.muted) {
+            userPreferences.save('volume', videoPlayer.volume);
+        }
+    });
+    
     // Scroll to top button
     window.addEventListener('scroll', () => {
         if (window.scrollY > 500) {
@@ -218,6 +374,42 @@ function setupEventListeners() {
     
     scrollToTop.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        // Only handle keyboard shortcuts when not typing in inputs
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        
+        switch(e.key) {
+            case 'Escape':
+                if (!playerContainer.classList.contains('hidden')) {
+                    closeVideoPlayer();
+                }
+                break;
+            case 'f':
+            case 'F':
+                if (!playerContainer.classList.contains('hidden')) {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+                break;
+            case 'p':
+            case 'P':
+                if (!playerContainer.classList.contains('hidden')) {
+                    e.preventDefault();
+                    togglePictureInPicture();
+                }
+                break;
+            case '/':
+                e.preventDefault();
+                searchInput.focus();
+                break;
+            case '?':
+                e.preventDefault();
+                showToast('Keyboard shortcuts: ESC=Close player, F=Fullscreen, P=Picture-in-Picture, /=Search', 'info');
+                break;
+        }
     });
 }
 
@@ -315,7 +507,7 @@ function clearAllFilters() {
     filterChannels();
 }
 
-// Render channels to the grid
+// Render channels to the grid with virtual scrolling for performance
 function renderChannels() {
     channelGrid.innerHTML = '';
 
@@ -328,28 +520,155 @@ function renderChannels() {
     noResults.classList.add('hidden');
     channelGrid.classList.remove('hidden');
 
-    filteredChannels.forEach(channel => {
-        const card = createChannelCard(channel);
-        channelGrid.appendChild(card);
+    // Virtual scrolling for better performance with large datasets
+    const INITIAL_LOAD = 50; // Load first 50 channels immediately
+    const BATCH_SIZE = 25; // Load 25 more when scrolling near bottom
+    
+    let loadedChannels = 0;
+    const fragment = document.createDocumentFragment();
+    
+    function renderBatch(startIndex = 0, count = INITIAL_LOAD) {
+        const endIndex = Math.min(startIndex + count, filteredChannels.length);
+        
+        for (let i = startIndex; i < endIndex; i++) {
+            const card = createChannelCard(filteredChannels[i]);
+            fragment.appendChild(card);
+        }
+        
+        if (fragment.children.length > 0) {
+            channelGrid.appendChild(fragment);
+        }
+        
+        loadedChannels = endIndex;
+        
+        // Setup intersection observer for infinite scrolling
+        if (loadedChannels < filteredChannels.length) {
+            setupInfiniteScroll();
+        }
+    }
+    
+    // Initial render
+    renderBatch();
+    
+    // Setup lazy loading for images after initial render
+    requestAnimationFrame(() => {
+        setupLazyLoading();
     });
 }
 
-// Create channel card element
-function createChannelCard(channel) {
-    const card = document.createElement('div');
-    card.className = 'channel-card';
-    card.setAttribute('data-channel-id', channel.id);
+// Setup infinite scrolling for remaining channels
+function setupInfiniteScroll() {
+    const sentinel = document.createElement('div');
+    sentinel.className = 'scroll-sentinel';
+    sentinel.style.height = '10px';
+    channelGrid.appendChild(sentinel);
     
-    const logoDiv = document.createElement('div');
-    logoDiv.className = 'channel-logo';
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && loadedChannels < filteredChannels.length) {
+            observer.unobserve(sentinel);
+            sentinel.remove();
+            
+            // Render next batch
+            const fragment = document.createDocumentFragment();
+            const startIndex = loadedChannels;
+            const endIndex = Math.min(startIndex + 25, filteredChannels.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const card = createChannelCard(filteredChannels[i]);
+                fragment.appendChild(card);
+            }
+            
+            channelGrid.appendChild(fragment);
+            loadedChannels = endIndex;
+            
+            // Setup lazy loading for new images
+            setupLazyLoading();
+            
+            // Continue if there are more channels
+            if (loadedChannels < filteredChannels.length) {
+                setupInfiniteScroll();
+            }
+        }
+    }, {
+        rootMargin: '100px'
+    });
     
-    // Favorite button
+    observer.observe(sentinel);
+}
+
+// Setup optimized lazy loading for channel logo images
+function setupLazyLoading() {
+    if ('IntersectionObserver' in window) {
+        // Disconnect existing observer if any
+        if (window.channelImageObserver) {
+            window.channelImageObserver.disconnect();
+        }
+        
+        window.channelImageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        // Preload image before setting src
+                        const tempImg = new Image();
+                        tempImg.onload = () => {
+                            img.src = img.dataset.src;
+                            img.style.opacity = '1';
+                            img.removeAttribute('data-src');
+                        };
+                        tempImg.onerror = () => {
+                            // Handle broken images gracefully
+                            const logoDiv = img.parentElement;
+                            logoDiv.classList.add('no-logo');
+                            logoDiv.innerHTML = '<i class="fas fa-tv"></i>';
+                            // Re-add favorite button if it existed
+                            const favBtn = logoDiv.querySelector('.favorite-icon');
+                            if (!favBtn) {
+                                const card = logoDiv.closest('.channel-card');
+                                const channelId = card.dataset.channelId;
+                                const newFavBtn = createFavoriteButton(channelId);
+                                logoDiv.appendChild(newFavBtn);
+                            }
+                        };
+                        tempImg.src = img.dataset.src;
+                        
+                        window.channelImageObserver.unobserve(img);
+                    }
+                }
+            });
+        }, {
+            rootMargin: '50px 0px',
+            threshold: 0.1
+        });
+
+        // Observe all images with data-src attribute
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            window.channelImageObserver.observe(img);
+        });
+    } else {
+        // Fallback for browsers without IntersectionObserver
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            img.src = img.dataset.src;
+            img.removeAttribute('data-src');
+            img.style.opacity = '1';
+        });
+    }
+}
+
+// Create reusable favorite button
+function createFavoriteButton(channelId) {
     const favBtn = document.createElement('button');
     favBtn.className = 'favorite-icon';
-    if (favorites.includes(channel.id)) {
+    favBtn.setAttribute('aria-label', 'Add to favorites');
+    
+    if (favorites.includes(channelId)) {
         favBtn.classList.add('active');
+        favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        favBtn.setAttribute('aria-label', 'Remove from favorites');
+    } else {
+        favBtn.innerHTML = '<i class="far fa-heart"></i>';
     }
-    favBtn.innerHTML = favorites.includes(channel.id) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+    
     favBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         
@@ -359,23 +678,50 @@ function createChannelCard(channel) {
             favBtn.style.animation = '';
         }, 300);
         
-        toggleFavorite(channel.id);
+        toggleFavorite(channelId);
         
         // Update the button state based on the current favorites array
-        if (favorites.includes(channel.id)) {
+        if (favorites.includes(channelId)) {
             favBtn.classList.add('active');
             favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+            favBtn.setAttribute('aria-label', 'Remove from favorites');
         } else {
             favBtn.classList.remove('active');
             favBtn.innerHTML = '<i class="far fa-heart"></i>';
+            favBtn.setAttribute('aria-label', 'Add to favorites');
         }
     });
     
+    return favBtn;
+}
+
+// Create channel card element with optimizations
+function createChannelCard(channel) {
+    const card = document.createElement('div');
+    card.className = 'channel-card';
+    card.setAttribute('data-channel-id', channel.id);
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `Watch ${channel.name}`);
+    
+    const logoDiv = document.createElement('div');
+    logoDiv.className = 'channel-logo';
+    
+    // Favorite button
+    const favBtn = createFavoriteButton(channel.id);
+    
     if (channel.logo) {
         const img = document.createElement('img');
-        img.src = channel.logo;
+        img.dataset.src = channel.logo; // Use data-src for lazy loading
         img.alt = channel.name;
         img.loading = 'lazy';
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
+        
+        img.onload = () => {
+            img.style.opacity = '1';
+        };
+        
         img.onerror = () => {
             logoDiv.classList.add('no-logo');
             logoDiv.innerHTML = '<i class="fas fa-tv"></i>';
@@ -425,6 +771,14 @@ function createChannelCard(channel) {
     card.appendChild(infoDiv);
     
     card.addEventListener('click', () => playChannel(channel));
+    
+    // Add keyboard support for channel cards
+    card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            playChannel(channel);
+        }
+    });
     
     return card;
 }
@@ -616,7 +970,7 @@ function playChannel(channel) {
     loadStream(streamUrl);
 }
 
-// Load stream with HLS.js support
+// Load stream with HLS.js support and improved error handling
 function loadStream(url) {
     // Clean up previous player
     if (currentPlayer) {
@@ -626,6 +980,21 @@ function loadStream(url) {
 
     videoPlayer.src = '';
     videoPlayer.style.display = 'block';
+    playerError.classList.add('hidden');
+    loadingOverlay.classList.remove('hidden');
+    
+    // Set loading timeout
+    const loadingTimeout = setTimeout(() => {
+        loadingOverlay.classList.add('hidden');
+        showPlayerError();
+        showToast('Stream loading timeout. Please try another channel.', 'warning');
+    }, 30000); // 30 seconds timeout
+
+    // Clear timeout when stream loads successfully
+    const clearTimeoutOnSuccess = () => {
+        clearTimeout(loadingTimeout);
+        loadingOverlay.classList.add('hidden');
+    };
 
     if (url.includes('.m3u8')) {
         // HLS stream
@@ -633,15 +1002,20 @@ function loadStream(url) {
             currentPlayer = new Hls({
                 enableWorker: true,
                 lowLatencyMode: true,
+                maxLoadingDelay: 4,
+                maxBufferLength: 30,
+                maxBufferSize: 60 * 1000 * 1000,
             });
             
             currentPlayer.loadSource(url);
             currentPlayer.attachMedia(videoPlayer);
             
             currentPlayer.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
-                loadingOverlay.classList.add('hidden');
+                clearTimeoutOnSuccess();
                 videoPlayer.play().catch(err => {
                     console.error('Error playing video:', err);
+                    showPlayerError();
+                    showToast('Failed to start playback. Stream may be unavailable.', 'error');
                 });
                 
                 // Populate quality selector
@@ -651,53 +1025,79 @@ function loadStream(url) {
             });
 
             currentPlayer.on(Hls.Events.ERROR, function(event, data) {
+                console.error('HLS error:', data);
+                clearTimeout(loadingTimeout);
+                loadingOverlay.classList.add('hidden');
+                
                 if (data.fatal) {
-                    console.error('HLS error:', data);
-                    loadingOverlay.classList.add('hidden');
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            showToast('Network error: Unable to load stream', 'error');
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            showToast('Media error: Stream format not supported', 'error');
+                            break;
+                        default:
+                            showToast('Playback error: Stream unavailable', 'error');
+                            break;
+                    }
                     showPlayerError();
                 }
             });
         } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
             // Native HLS support (Safari)
             videoPlayer.src = url;
-            videoPlayer.addEventListener('loadeddata', () => {
-                loadingOverlay.classList.add('hidden');
-            });
-            videoPlayer.play().catch(err => {
-                console.error('Error playing video:', err);
+            videoPlayer.addEventListener('loadeddata', clearTimeoutOnSuccess, { once: true });
+            videoPlayer.addEventListener('error', () => {
+                clearTimeout(loadingTimeout);
                 loadingOverlay.classList.add('hidden');
                 showPlayerError();
+                showToast('Failed to load stream', 'error');
+            }, { once: true });
+            videoPlayer.play().catch(err => {
+                console.error('Error playing video:', err);
+                clearTimeout(loadingTimeout);
+                loadingOverlay.classList.add('hidden');
+                showPlayerError();
+                showToast('Failed to start playback', 'error');
             });
         } else {
             // HLS.js not available, try direct playback anyway
             console.warn('HLS.js not available, attempting direct playback');
             videoPlayer.src = url;
-            videoPlayer.addEventListener('loadeddata', () => {
-                loadingOverlay.classList.add('hidden');
-            });
-            videoPlayer.play().catch(err => {
-                console.error('Error playing video (HLS.js unavailable):', err);
+            videoPlayer.addEventListener('loadeddata', clearTimeoutOnSuccess, { once: true });
+            videoPlayer.addEventListener('error', () => {
+                clearTimeout(loadingTimeout);
                 loadingOverlay.classList.add('hidden');
                 showPlayerError();
+                showToast('HLS.js not available and direct playback failed', 'error');
+            }, { once: true });
+            videoPlayer.play().catch(err => {
+                console.error('Error playing video (HLS.js unavailable):', err);
+                clearTimeout(loadingTimeout);
+                loadingOverlay.classList.add('hidden');
+                showPlayerError();
+                showToast('Failed to start playback', 'error');
             });
         }
     } else {
         // Direct stream
         videoPlayer.src = url;
-        videoPlayer.addEventListener('loadeddata', () => {
-            loadingOverlay.classList.add('hidden');
-        });
-        videoPlayer.play().catch(err => {
-            console.error('Error playing video:', err);
+        videoPlayer.addEventListener('loadeddata', clearTimeoutOnSuccess, { once: true });
+        videoPlayer.addEventListener('error', () => {
+            clearTimeout(loadingTimeout);
             loadingOverlay.classList.add('hidden');
             showPlayerError();
+            showToast('Failed to load direct stream', 'error');
+        }, { once: true });
+        videoPlayer.play().catch(err => {
+            console.error('Error playing video:', err);
+            clearTimeout(loadingTimeout);
+            loadingOverlay.classList.add('hidden');
+            showPlayerError();
+            showToast('Failed to start playback', 'error');
         });
     }
-
-    videoPlayer.onerror = function() {
-        loadingOverlay.classList.add('hidden');
-        showPlayerError();
-    };
 }
 
 // Populate quality selector
@@ -739,6 +1139,69 @@ function closeVideoPlayer() {
     currentChannel = null;
 }
 
+// User preferences management
+const userPreferences = {
+    save: function(key, value) {
+        try {
+            localStorage.setItem(`freetv_${key}`, JSON.stringify(value));
+        } catch (error) {
+            console.warn('Failed to save preference:', key, error);
+        }
+    },
+    
+    load: function(key, defaultValue = null) {
+        try {
+            const item = localStorage.getItem(`freetv_${key}`);
+            return item ? JSON.parse(item) : defaultValue;
+        } catch (error) {
+            console.warn('Failed to load preference:', key, error);
+            return defaultValue;
+        }
+    },
+    
+    remove: function(key) {
+        try {
+            localStorage.removeItem(`freetv_${key}`);
+        } catch (error) {
+            console.warn('Failed to remove preference:', key, error);
+        }
+    }
+};
+
+// Load saved user preferences
+function loadUserPreferences() {
+    // Load theme preference
+    const savedTheme = userPreferences.load('theme', 'dark');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    
+    // Load last used filters
+    const lastFilters = userPreferences.load('filters', {});
+    if (lastFilters.category) categoryFilter.value = lastFilters.category;
+    if (lastFilters.country) countryFilter.value = lastFilters.country;
+    if (lastFilters.language) languageFilter.value = lastFilters.language;
+    if (lastFilters.sortBy) sortBy.value = lastFilters.sortBy;
+    
+    // Load volume preference
+    const savedVolume = userPreferences.load('volume', 0.8);
+    if (videoPlayer) {
+        videoPlayer.volume = savedVolume;
+    }
+}
+
+// Save current filter state
+function saveCurrentFilters() {
+    const currentFilters = {
+        category: categoryFilter.value,
+        country: countryFilter.value,
+        language: languageFilter.value,
+        sortBy: sortBy.value
+    };
+    userPreferences.save('filters', currentFilters);
+}
+
 // Toggle Picture in Picture
 async function togglePictureInPicture() {
     try {
@@ -775,12 +1238,13 @@ function toggleTheme() {
     if (themeToggle) {
         themeToggle.innerHTML = isLight ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    userPreferences.save('theme', isLight ? 'light' : 'dark');
+    showToast(`Switched to ${isLight ? 'light' : 'dark'} theme`, 'success', 2000);
 }
 
 // Load theme
 function loadTheme() {
-    const theme = localStorage.getItem('theme') || 'dark';
+    const theme = userPreferences.load('theme', 'dark');
     if (theme === 'light') {
         document.body.classList.add('light-theme');
         if (themeToggle) {
@@ -809,8 +1273,8 @@ function showLoading(show) {
     }
 }
 
-// Show toast notification
-function showToast(message, type = 'info') {
+// Show toast notification with auto-dismiss and progress bar
+function showToast(message, type = 'info', duration = 3000) {
     if (!toast) return;
     
     const toastIcon = toast.querySelector('.toast-icon');
@@ -821,19 +1285,31 @@ function showToast(message, type = 'info') {
     toast.className = `toast ${type}`;
     toastMessage.textContent = message;
     
-    if (type === 'success') {
-        toastIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
-    } else if (type === 'error') {
-        toastIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
-    } else {
-        toastIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
-    }
+    // Set appropriate icon based on type
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    };
+    
+    toastIcon.innerHTML = `<i class="${icons[type] || icons.info}"></i>`;
     
     toast.classList.remove('hidden');
     
-    setTimeout(() => {
+    // Auto-dismiss after duration
+    const dismissTimeout = setTimeout(() => {
         toast.classList.add('hidden');
-    }, 3000);
+    }, duration);
+    
+    // Allow manual dismissal by clicking
+    const dismissHandler = () => {
+        clearTimeout(dismissTimeout);
+        toast.classList.add('hidden');
+        toast.removeEventListener('click', dismissHandler);
+    };
+    
+    toast.addEventListener('click', dismissHandler);
 }
 
 // Debounce function
@@ -850,4 +1326,14 @@ function debounce(func, wait) {
 }
 
 // Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    // Register service worker for caching
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('✅ Service Worker registered'))
+            .catch(err => console.log('❌ Service Worker registration failed:', err));
+    }
+    
+    // Initialize the app
+    init();
+});

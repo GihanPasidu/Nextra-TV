@@ -32,10 +32,27 @@ body.light-theme {
     --border-color: #e2e8f0;
 }
 
+/* Performance optimizations */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Enable hardware acceleration for animations */
+.channel-card,
+.toast,
+.scroll-to-top,
+.preloader-spinner {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Optimize font loading */
+@font-face {
+    font-family: 'Poppins';
+    font-display: swap;
+    src: url('https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2') format('woff2');
 }
 
 html {
@@ -682,6 +699,15 @@ main {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
     animation: fadeIn 0.5s ease;
+    /* Optimize for large lists */
+    contain: layout style paint;
+}
+
+/* Scroll sentinel for infinite scrolling */
+.scroll-sentinel {
+    grid-column: 1 / -1;
+    height: 10px;
+    background: transparent;
 }
 
 @keyframes fadeIn {
@@ -1025,10 +1051,16 @@ footer {
     min-width: 300px;
     animation: slideInUp 0.3s ease;
     transition: var(--transition-normal);
+    cursor: pointer;
 }
 
 .toast.hidden {
     display: none;
+}
+
+.toast:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
 }
 
 .toast.success {
@@ -1037,6 +1069,10 @@ footer {
 
 .toast.error {
     border-left: 4px solid var(--error-color);
+}
+
+.toast.warning {
+    border-left: 4px solid var(--warning-color);
 }
 
 .toast.info {
@@ -1064,6 +1100,10 @@ footer {
 
 .toast.error .toast-icon {
     color: var(--error-color);
+}
+
+.toast.warning .toast-icon {
+    color: var(--warning-color);
 }
 
 .toast.info .toast-icon {
@@ -1106,7 +1146,51 @@ footer {
     box-shadow: var(--shadow-lg);
 }
 
-/* Responsive design */
+/* Add focus styles for better accessibility */
+button:focus,
+select:focus,
+input:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.channel-card:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    transform: translateY(-8px);
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .scroll-to-top,
+    .channel-card,
+    .toast {
+        transform: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #0066cc;
+        --secondary-color: #004499;
+        --border-color: #666666;
+        --text-primary: #000000;
+        --text-secondary: #333333;
+    }
+    
+    body.light-theme {
+        --text-primary: #000000;
+        --text-secondary: #333333;
+        --border-color: #666666;
+    }
+}
 @media (max-width: 1024px) {
     .content-wrapper {
         grid-template-columns: 1fr;

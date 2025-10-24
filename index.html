@@ -10,18 +10,76 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
-<<<<<<< HEAD
-<<<<<<< HEAD
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
+    <link rel="preload" href="script.js" as="script">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap"></noscript>
+    
+    <!-- DNS prefetch for external resources -->
+    <link rel="dns-prefetch" href="//iptv-org.github.io">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
     <style>
-        /* Critical CSS for fast initial render */
+        /* Critical above-the-fold CSS - inline for fastest render */
         body { 
             margin: 0; 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #f1f5f9;
             min-height: 100vh;
+            line-height: 1.6;
         }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header critical styles */
+        header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            padding: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+        
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+            margin: 0;
+        }
+        
+        .tagline {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            font-weight: 300;
+        }
+        
+        /* Preloader styles */
         .preloader {
             position: fixed;
             top: 0;
@@ -30,10 +88,15 @@
             height: 100%;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .preloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
         }
         .preloader-spinner {
             width: 50px;
@@ -42,22 +105,44 @@
             border-top: 3px solid #2563eb;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        .preloader-text {
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .preloader-subtitle {
+            color: #cbd5e1;
+            font-size: 0.85rem;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .fade-out {
+        
+        /* Hide non-critical content initially */
+        .main-nav, main, footer {
             opacity: 0;
-            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .content-loaded .main-nav,
+        .content-loaded main,
+        .content-loaded footer {
+            opacity: 1;
         }
     </style>
-=======
->>>>>>> parent of ea432a3 (update)
-=======
->>>>>>> parent of ea432a3 (update)
 </head>
 <body>
+    <!-- Preloader -->
+    <div id="preloader" class="preloader">
+        <div class="preloader-spinner"></div>
+        <div class="preloader-text">Free TV</div>
+        <div class="preloader-subtitle">Loading channels...</div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-left">
@@ -263,19 +348,40 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js" defer></script>
+    <script src="performance.js"></script>
     <script>
-        // Fallback CDN for HLS.js if primary fails
-        if (typeof Hls === 'undefined') {
-            console.log('Primary HLS.js CDN failed, trying fallback...');
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
-            fallbackScript.onerror = function() {
-                console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
-            };
-            document.head.appendChild(fallbackScript);
+        // Non-blocking font awesome loading
+        function loadFontAwesome() {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+            document.head.appendChild(link);
         }
+        
+        // Load font awesome after initial render
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadFontAwesome);
+        } else {
+            loadFontAwesome();
+        }
+        
+        // Fallback CDN for HLS.js if primary fails
+        function checkHLS() {
+            if (typeof Hls === 'undefined') {
+                console.log('Primary HLS.js CDN failed, trying fallback...');
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
+                fallbackScript.onerror = function() {
+                    console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
+                };
+                document.head.appendChild(fallbackScript);
+            }
+        }
+        
+        // Check HLS after DOM is ready
+        setTimeout(checkHLS, 100);
     </script>
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>
