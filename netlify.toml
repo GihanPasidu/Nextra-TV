@@ -47,7 +47,3 @@
   # Local development settings
   port = 8000
   autoLaunch = true
-
-[[plugins]]
-  # Enable Netlify form handling (if needed in future)
-  package = "@netlify/plugin-functions-core"
