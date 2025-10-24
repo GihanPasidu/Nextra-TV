@@ -1107,21 +1107,6 @@ footer {
 }
 
 /* Responsive design */
-@media (max-width: 1200px) {
-    .container {
-        max-width: 100%;
-        padding: 0 15px;
-    }
-    
-    .content-wrapper {
-        gap: 15px;
-    }
-    
-    .sidebar {
-        width: 220px;
-    }
-}
-
 @media (max-width: 1024px) {
     .content-wrapper {
         grid-template-columns: 1fr;
@@ -1130,11 +1115,6 @@ footer {
     .sidebar {
         position: relative;
         top: 0;
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 20px;
     }
 
     .quick-access-list,
@@ -1150,11 +1130,6 @@ footer {
 
     .main-nav {
         top: 88px;
-    }
-    
-    .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 15px;
     }
 }
 
@@ -1182,80 +1157,54 @@ footer {
 
     .main-nav {
         top: 78px;
-        padding: 15px 0;
     }
 
     .main-nav .container {
         flex-direction: column;
-        gap: 15px;
-    }
-    
-    .search-bar {
-        width: 100%;
-        max-width: none;
     }
 
     .filter-controls {
         width: 100%;
-        flex-wrap: wrap;
-        gap: 10px;
     }
 
     .filter-controls select {
         flex: 1;
-        min-width: 120px;
-        font-size: 14px;
+        min-width: auto;
     }
 
     .clear-filters-btn {
         width: 100%;
         justify-content: center;
-        margin-top: 10px;
-    }
-
-    .sidebar {
-        grid-template-columns: 1fr;
-        gap: 15px;
     }
 
     .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
     }
 
     .channels-header {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
         gap: 15px;
     }
 
     .header-actions {
         width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
+        justify-content: space-between;
     }
 
     .player-container {
         padding: 15px;
-        margin: 10px 0;
     }
 
     .player-header {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 15px;
+        align-items: flex-start;
     }
 
     .player-controls-header {
         width: 100%;
-        justify-content: center;
-    }
-    
-    .video-wrapper {
-        height: 250px;
+        justify-content: flex-end;
     }
 
     .toast {
@@ -1270,398 +1219,29 @@ footer {
         width: 45px;
         height: 45px;
     }
-    
-    .footer-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        text-align: center;
-    }
 }
 
 @media (max-width: 480px) {
-    .container {
-        padding: 0 10px;
-    }
-    
-    header {
-        padding: 12px 0;
-    }
-    
-    .logo {
-        gap: 8px;
-    }
-    
-    .logo i {
-        font-size: 1.8rem;
-    }
-    
-    .logo h1 {
-        font-size: 1.3rem;
-    }
-    
-    .tagline {
-        font-size: 0.6rem;
-    }
-    
-    .header-right {
-        gap: 6px;
-    }
-    
-    .header-btn {
-        padding: 6px 8px;
-        font-size: 0.85rem;
-        min-width: 36px;
-    }
-    
-    .favorites-count {
-        width: 16px;
-        height: 16px;
-        font-size: 0.65rem;
-    }
-    
-    .main-nav {
-        padding: 12px 0;
-        top: 68px;
-    }
-    
-    .search-bar input {
-        font-size: 14px;
-        padding: 10px 12px 10px 40px;
-    }
-    
-    .search-bar i {
-        left: 12px;
-        font-size: 0.9rem;
-    }
-    
-    .filter-controls select {
-        font-size: 13px;
-        padding: 8px;
-        min-width: 100px;
-    }
-    
-    .clear-filters-btn {
-        font-size: 0.85rem;
-        padding: 8px 12px;
-    }
-
     .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
-    }
-    
-    .channel-card {
-        min-height: 180px;
-    }
-    
-    .channel-name {
-        font-size: 0.8rem;
-        line-height: 1.2;
-    }
-    
-    .channel-tag {
-        font-size: 0.65rem;
-        padding: 2px 5px;
-    }
-    
-    .channel-country {
-        font-size: 0.7rem;
-    }
-    
-    .favorite-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 0.85rem;
+        grid-template-columns: 1fr;
     }
 
     .quick-access-list,
     .category-list {
         grid-template-columns: 1fr;
     }
-    
-    .quick-access-list li,
-    .category-list li {
-        padding: 8px 12px;
-        font-size: 0.8rem;
-    }
-    
-    .sidebar h3 {
-        font-size: 0.95rem;
-    }
-    
-    .channels-header h2 {
-        font-size: 1.4rem;
-    }
-    
-    .section-subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .channel-count {
-        font-size: 0.75rem;
-    }
-    
-    .sort-control select {
-        font-size: 0.75rem;
-        padding: 5px 6px;
-    }
-    
-    .video-wrapper {
-        height: 200px;
-    }
-    
-    .player-header h2 {
-        font-size: 1.1rem;
-    }
-    
-    .player-control-btn {
-        padding: 6px;
-        font-size: 0.85rem;
-    }
-    
-    .info-tag {
-        font-size: 0.65rem;
-        padding: 3px 6px;
-    }
-    
-    .stream-quality select {
-        font-size: 0.75rem;
-        padding: 5px 6px;
-    }
 
     .player-info {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
     }
 
     .stream-quality {
         width: 100%;
         justify-content: space-between;
     }
-    
-    .toast {
-        bottom: 15px;
-        left: 10px;
-        right: 10px;
-        margin: 0;
-        border-radius: 8px;
-    }
-    
-    .toast-message {
-        font-size: 0.8rem;
-    }
-    
-    .scroll-to-top {
-        bottom: 15px;
-        right: 12px;
-        width: 40px;
-        height: 40px;
-        font-size: 0.9rem;
-    }
-    
-    .no-results h3 {
-        font-size: 1.1rem;
-    }
-    
-    .no-results p {
-        font-size: 0.85rem;
-    }
-    
-    .reset-btn {
-        padding: 8px 16px;
-        font-size: 0.8rem;
-    }
 
     .footer-content {
         grid-template-columns: 1fr;
-        text-align: center;
-    }
-    
-    .footer-section p {
-        font-size: 0.85rem;
-    }
-}
-
-/* Extra small devices (phones in portrait, less than 350px) */
-@media (max-width: 350px) {
-    .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 8px;
-    }
-    
-    .logo h1 {
-        font-size: 1.1rem;
-    }
-    
-    .header-btn {
-        padding: 5px 6px;
-        font-size: 0.8rem;
-        min-width: 32px;
-    }
-    
-    .filter-controls {
-        flex-direction: column;
-    }
-    
-    .filter-controls select {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .channel-card {
-        min-height: 160px;
-    }
-    
-    .channel-name {
-        font-size: 0.75rem;
-    }
-    
-    .video-wrapper {
-        height: 180px;
-    }
-    
-    .favorite-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Large screens and high-resolution displays */
-@media (min-width: 1600px) {
-    .container {
-        max-width: 1400px;
-    }
-    
-    .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 25px;
-    }
-    
-    .sidebar {
-        width: 280px;
-    }
-}
-
-/* Landscape orientation on mobile devices */
-@media (max-width: 768px) and (orientation: landscape) {
-    .video-wrapper {
-        height: 280px;
-    }
-    
-    .sidebar {
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-    
-    .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    }
-    
-    .main-nav {
-        top: 60px;
-    }
-    
-    header {
-        padding: 10px 0;
-    }
-}
-
-/* Touch device optimizations */
-@media (hover: none) and (pointer: coarse) {
-    .channel-card:hover {
-        transform: none;
-    }
-    
-    .channel-card:active {
-        transform: scale(0.95);
-        transition: transform 0.1s ease;
-    }
-    
-    .header-btn:hover,
-    .player-control-btn:hover,
-    .favorite-icon:hover {
-        background: var(--accent-color);
-    }
-    
-    .quick-access-list li:hover,
-    .category-list li:hover {
-        background: var(--accent-color);
-    }
-    
-    /* Increase touch targets for better usability */
-    .header-btn,
-    .player-control-btn,
-    .favorite-icon {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    .filter-controls select {
-        min-height: 44px;
-    }
-    
-    .search-bar input {
-        min-height: 44px;
-    }
-}
-
-/* High DPI displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .logo i,
-    .channel-logo img {
-        image-rendering: crisp-edges;
-    }
-}
-
-/* Dark mode support for devices that prefer dark themes */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --dark-bg: #0f172a;
-        --dark-card: #1e293b;
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --border-color: #334155;
-    }
-}
-
-/* Reduced motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-    
-    .logo i {
-        animation: none;
-    }
-    
-    .preloader-spinner {
-        animation: none;
-        border: 3px solid var(--primary-color);
-    }
-    
-    .channel-card:hover {
-        transform: none;
-    }
-}
-
-/* Print styles */
-@media print {
-    .header-btn,
-    .player-container,
-    .sidebar,
-    .toast,
-    .scroll-to-top {
-        display: none !important;
-    }
-    
-    .channel-grid {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
-    
-    .channel-card {
-        break-inside: avoid;
     }
 }

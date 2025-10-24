@@ -545,130 +545,18 @@ function setupEventListeners() {
     pictureInPicture.addEventListener('click', togglePictureInPicture);
     fullscreenBtn.addEventListener('click', toggleFullscreen);
     
-    // Enhanced scroll handling for mobile
-    let scrollTimeout;
+    // Scroll to top button
     window.addEventListener('scroll', () => {
-        // Show/hide scroll to top button
         if (window.scrollY > 500) {
             scrollToTop.classList.remove('hidden');
         } else {
             scrollToTop.classList.add('hidden');
         }
-        
-        // Clear timeout if it exists
-        if (scrollTimeout) {
-            clearTimeout(scrollTimeout);
-        }
-        
-        // Set new timeout for lazy loading check
-        scrollTimeout = setTimeout(() => {
-            // Trigger lazy loading if near bottom
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
-                if (window.currentScrollHandler) {
-                    window.currentScrollHandler();
-                }
-            }
-        }, 100);
     });
     
     scrollToTop.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    
-    // Touch event optimizations for mobile
-    let touchStartY = 0;
-    let touchStartX = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-    
-    document.addEventListener('touchmove', (e) => {
-        // Prevent pull-to-refresh on iOS when scrolling content
-        if (window.scrollY === 0 && e.touches[0].clientY > touchStartY) {
-            e.preventDefault();
-        }
-    }, { passive: false });
-    
-    // Keyboard navigation support
-    document.addEventListener('keydown', handleKeyboardNavigation);
-    
-    // Handle orientation change for mobile devices
-    window.addEventListener('orientationchange', () => {
-        setTimeout(() => {
-            // Recalculate layout after orientation change
-            if (window.innerWidth < 768) {
-                updateMobileLayout();
-            }
-        }, 100);
-    });
-    
-    // Handle resize for responsive behavior
-    window.addEventListener('resize', debounce(() => {
-        updateResponsiveLayout();
-    }, 250));
-}
-
-// Handle keyboard navigation
-function handleKeyboardNavigation(e) {
-    // ESC key closes video player
-    if (e.key === 'Escape' && !playerContainer.classList.contains('hidden')) {
-        closeVideoPlayer();
-        e.preventDefault();
-    }
-    
-    // Space key for play/pause (when video player is open)
-    if (e.key === ' ' && !playerContainer.classList.contains('hidden') && videoPlayer) {
-        if (videoPlayer.paused) {
-            videoPlayer.play();
-        } else {
-            videoPlayer.pause();
-        }
-        e.preventDefault();
-    }
-    
-    // F key for fullscreen
-    if (e.key === 'f' && !playerContainer.classList.contains('hidden')) {
-        toggleFullscreen();
-        e.preventDefault();
-    }
-    
-    // Search focus with Ctrl+F or /
-    if ((e.ctrlKey && e.key === 'f') || e.key === '/') {
-        searchInput.focus();
-        e.preventDefault();
-    }
-}
-
-// Update layout for mobile devices
-function updateMobileLayout() {
-    if (window.innerWidth < 768) {
-        // Ensure proper video player sizing on mobile
-        if (!playerContainer.classList.contains('hidden')) {
-            const videoWrapper = document.querySelector('.video-wrapper');
-            if (videoWrapper) {
-                const aspectRatio = 16 / 9;
-                const maxWidth = window.innerWidth - 40; // Account for padding
-                const maxHeight = window.innerHeight * 0.4; // Max 40% of viewport height
-                
-                const calculatedHeight = maxWidth / aspectRatio;
-                const finalHeight = Math.min(calculatedHeight, maxHeight);
-                
-                videoWrapper.style.height = `${finalHeight}px`;
-            }
-        }
-    }
-}
-
-// Update responsive layout on resize
-function updateResponsiveLayout() {
-    updateMobileLayout();
-    
-    // Re-render channel grid if needed
-    if (filteredChannels.length > 0) {
-        renderChannels();
-    }
 }
 
 // Update view based on selection
