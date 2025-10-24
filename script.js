@@ -52,47 +52,27 @@ const toast = document.getElementById('toast');
 // Initialize the application
 async function init() {
     try {
-        // Hide preloader
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            setTimeout(() => {
-                preloader.classList.add('fade-out');
-                setTimeout(() => preloader.remove(), 300);
-            }, 500);
+        // Check if HLS.js is available
+        if (typeof Hls === 'undefined') {
+            console.warn('HLS.js not loaded. Some video streams may not work.');
+            showToast('Video streaming library loading...', 'info');
         }
         
-        // Load essential UI first for faster perceived performance
+        showLoading(true);
+        await loadChannelsAndStreams();
         setupEventListeners();
         loadTheme();
+        updateView(); // Initialize with proper view
         updateFavoritesCount();
+        showLoading(false);
         
-        // Set initial section subtitle immediately
+        // Set initial section subtitle
         if (sectionSubtitle) {
             sectionSubtitle.textContent = 'Browse all live TV channels from around the world';
         }
-        
-        // Load mock data immediately for instant UI
-        loadMockData();
-        updateView();
-        showLoading(false);
-        
-        // Try to load real data in background
-        setTimeout(async () => {
-            try {
-                console.log('Loading real channel data in background...');
-                await loadChannelsAndStreams();
-                updateView();
-                showToast('Live channel data loaded!', 'success');
-            } catch (error) {
-                console.log('Using demo data - real API unavailable');
-            }
-        }, 2000); // Load real data after 2 seconds
-        
     } catch (error) {
         console.error('Error initializing app:', error);
-        showToast('Loading demo channels...', 'info');
-        loadMockData();
-        updateView();
+        showToast('Failed to load channels. Please refresh the page.', 'error');
         showLoading(false);
     }
 }
@@ -100,16 +80,10 @@ async function init() {
 // Load channels and streams data
 async function loadChannelsAndStreams() {
     try {
-        // Add timeout to API calls
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
         const [channelsResponse, streamsResponse] = await Promise.all([
-            fetch(CHANNELS_API, { signal: controller.signal }),
-            fetch(STREAMS_API, { signal: controller.signal })
+            fetch(CHANNELS_API),
+            fetch(STREAMS_API)
         ]);
-
-        clearTimeout(timeoutId);
 
         if (!channelsResponse.ok || !streamsResponse.ok) {
             throw new Error('Failed to fetch data');
@@ -118,11 +92,8 @@ async function loadChannelsAndStreams() {
         allChannels = await channelsResponse.json();
         allStreams = await streamsResponse.json();
 
-        // Optimize data processing - limit initial channels for faster loading
-        const limitedChannels = allChannels.slice(0, 500); // Load first 500 channels for faster initial load
-
         // Merge channels with their streams
-        allChannels = limitedChannels.map(channel => {
+        allChannels = allChannels.map(channel => {
             const channelStreams = allStreams.filter(stream => stream.channel === channel.id);
             return {
                 ...channel,
@@ -134,319 +105,10 @@ async function loadChannelsAndStreams() {
         
         populateFilters();
         updateChannelCount();
-        
-        showToast(`Loaded ${allChannels.length} channels successfully`, 'success');
     } catch (error) {
         console.error('Error loading data:', error);
-        throw error; // Let init handle the fallback
+        throw error;
     }
-}
-
-// Load mock data for testing when API is unavailable
-function loadMockData() {
-    console.log('Loading mock data for testing...');
-    
-    allChannels = [
-        {
-            id: 'mock-channel-1',
-            name: 'BBC News',
-            logo: null,
-            categories: ['News'],
-            countries: ['GB'],
-            languages: ['English'],
-            alt_names: ['BBC News Channel']
-        },
-        {
-            id: 'mock-channel-2',
-            name: 'CNN International',
-            logo: null,
-            categories: ['News'],
-            countries: ['US'],
-            languages: ['English'],
-            alt_names: ['CNN']
-        },
-        {
-            id: 'mock-channel-3',
-            name: 'France 24',
-            logo: null,
-            categories: ['News'],
-            countries: ['FR'],
-            languages: ['French', 'English'],
-            alt_names: ['France24']
-        },
-        {
-            id: 'mock-channel-4',
-            name: 'Deutsche Welle',
-            logo: null,
-            categories: ['News'],
-            countries: ['DE'],
-            languages: ['German', 'English'],
-            alt_names: ['DW']
-        },
-        {
-            id: 'mock-channel-5',
-            name: 'NHK World',
-            logo: null,
-            categories: ['News'],
-            countries: ['JP'],
-            languages: ['Japanese', 'English'],
-            alt_names: ['NHK World Japan']
-        },
-        {
-            id: 'mock-channel-6',
-            name: 'ESPN Sports',
-            logo: null,
-            categories: ['Sports'],
-            countries: ['US'],
-            languages: ['English'],
-            alt_names: ['ESPN']
-        },
-        {
-            id: 'mock-channel-7',
-            name: 'Eurosport',
-            logo: null,
-            categories: ['Sports'],
-            countries: ['FR'],
-            languages: ['French', 'English'],
-            alt_names: ['Eurosport 1']
-        },
-        {
-            id: 'mock-channel-8',
-            name: 'Sky Sports',
-            logo: null,
-            categories: ['Sports'],
-            countries: ['GB'],
-            languages: ['English'],
-            alt_names: ['Sky Sports Main Event']
-        },
-        {
-            id: 'mock-channel-9',
-            name: 'RAI Sport',
-            logo: null,
-            categories: ['Sports'],
-            countries: ['IT'],
-            languages: ['Italian'],
-            alt_names: ['Rai Sport']
-        },
-        {
-            id: 'mock-channel-10',
-            name: 'TV Globo',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['BR'],
-            languages: ['Portuguese'],
-            alt_names: ['Globo']
-        },
-        {
-            id: 'mock-channel-11',
-            name: 'Canal+',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['FR'],
-            languages: ['French'],
-            alt_names: ['Canal Plus']
-        },
-        {
-            id: 'mock-channel-12',
-            name: 'RTL Television',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['DE'],
-            languages: ['German'],
-            alt_names: ['RTL']
-        },
-        {
-            id: 'mock-channel-13',
-            name: 'Televisa',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['MX'],
-            languages: ['Spanish'],
-            alt_names: ['Canal de las Estrellas']
-        },
-        {
-            id: 'mock-channel-14',
-            name: 'CBC Television',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['CA'],
-            languages: ['English', 'French'],
-            alt_names: ['CBC']
-        },
-        {
-            id: 'mock-channel-15',
-            name: 'ABC Australia',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['AU'],
-            languages: ['English'],
-            alt_names: ['ABC TV']
-        },
-        {
-            id: 'mock-channel-16',
-            name: 'CCTV-4',
-            logo: null,
-            categories: ['News'],
-            countries: ['CN'],
-            languages: ['Chinese'],
-            alt_names: ['China Central Television']
-        },
-        {
-            id: 'mock-channel-17',
-            name: 'Russia Today',
-            logo: null,
-            categories: ['News'],
-            countries: ['RU'],
-            languages: ['Russian', 'English'],
-            alt_names: ['RT']
-        },
-        {
-            id: 'mock-channel-18',
-            name: 'Al Jazeera English',
-            logo: null,
-            categories: ['News'],
-            countries: ['QA'],
-            languages: ['English'],
-            alt_names: ['Al Jazeera']
-        },
-        {
-            id: 'mock-channel-19',
-            name: 'Doordarshan',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['IN'],
-            languages: ['Hindi', 'English'],
-            alt_names: ['DD National']
-        },
-        {
-            id: 'mock-channel-20',
-            name: 'KBS World',
-            logo: null,
-            categories: ['Entertainment'],
-            countries: ['KR'],
-            languages: ['Korean'],
-            alt_names: ['Korean Broadcasting System']
-        }
-    ];
-    
-    allStreams = [
-        {
-            channel: 'mock-channel-1',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-2',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-3',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-4',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-5',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-6',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-7',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-8',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-9',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-10',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-11',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-12',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-13',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-14',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-15',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-16',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-17',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-18',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-19',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-            quality: '720p'
-        },
-        {
-            channel: 'mock-channel-20',
-            url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-            quality: '720p'
-        }
-    ];
-    
-    // Merge channels with their streams
-    allChannels = allChannels.map(channel => {
-        const channelStreams = allStreams.filter(stream => stream.channel === channel.id);
-        return {
-            ...channel,
-            streams: channelStreams
-        };
-    }).filter(channel => channel.streams && channel.streams.length > 0);
-    
-    filteredChannels = [...allChannels];
-    
-    populateFilters();
-    updateChannelCount();
-    
-    showToast('Using demo channels for testing', 'info');
 }
 
 // Populate filter dropdowns
@@ -653,7 +315,7 @@ function clearAllFilters() {
     filterChannels();
 }
 
-// Render channels to the grid with lazy loading
+// Render channels to the grid
 function renderChannels() {
     channelGrid.innerHTML = '';
 
@@ -666,107 +328,103 @@ function renderChannels() {
     noResults.classList.add('hidden');
     channelGrid.classList.remove('hidden');
 
-    // Implement virtual scrolling for better performance
-    const itemsPerPage = 50;
-    const totalPages = Math.ceil(filteredChannels.length / itemsPerPage);
-    let currentPage = 0;
-
-    function loadPage(page) {
-        const startIndex = page * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, filteredChannels.length);
-        
-        for (let i = startIndex; i < endIndex; i++) {
-            const channel = filteredChannels[i];
-            const card = createChannelCard(channel);
-            channelGrid.appendChild(card);
-        }
-    }
-
-    // Load first page immediately
-    loadPage(currentPage);
-
-    // Add scroll listener for infinite loading
-    const scrollHandler = debounce(() => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
-            if (currentPage < totalPages - 1) {
-                currentPage++;
-                loadPage(currentPage);
-            }
-        }
-    }, 200);
-
-    // Remove previous scroll listener and add new one
-    window.removeEventListener('scroll', window.currentScrollHandler);
-    window.currentScrollHandler = scrollHandler;
-    window.addEventListener('scroll', scrollHandler);
+    filteredChannels.forEach(channel => {
+        const card = createChannelCard(channel);
+        channelGrid.appendChild(card);
+    });
 }
 
-// Create channel card element with optimized performance
+// Create channel card element
 function createChannelCard(channel) {
-    // Use document fragment for better performance
-    const fragment = document.createDocumentFragment();
     const card = document.createElement('div');
     card.className = 'channel-card';
     card.setAttribute('data-channel-id', channel.id);
     
-    // Build HTML string instead of creating multiple DOM elements
-    const isFavorite = favorites.includes(channel.id);
-    const heartIcon = isFavorite ? 'fas fa-heart' : 'far fa-heart';
-    const activeClass = isFavorite ? ' active' : '';
+    const logoDiv = document.createElement('div');
+    logoDiv.className = 'channel-logo';
     
-    const logoHTML = channel.logo 
-        ? `<img src="${channel.logo}" alt="${channel.name}" loading="lazy" onerror="this.parentElement.classList.add('no-logo'); this.parentElement.innerHTML='<i class=\\"fas fa-tv\\"></i><button class=\\"favorite-icon${activeClass}\\" data-channel-id=\\"${channel.id}\\"><i class=\\"${heartIcon}\\"></i></button>';">`
-        : '<i class="fas fa-tv"></i>';
-    
-    const categoryHTML = channel.categories && channel.categories.length > 0 
-        ? `<span class="channel-tag">${channel.categories[0]}</span>` 
-        : '';
-    
-    const countryHTML = channel.countries && channel.countries.length > 0 
-        ? `<div class="channel-country">
-            <span class="country-flag">${getCountryFlag(channel.countries[0].toLowerCase())}</span>
-            <span>${channel.countries[0]}</span>
-           </div>`
-        : '';
-    
-    card.innerHTML = `
-        <div class="channel-logo ${!channel.logo ? 'no-logo' : ''}">
-            ${logoHTML}
-            <button class="favorite-icon${activeClass}" data-channel-id="${channel.id}">
-                <i class="${heartIcon}"></i>
-            </button>
-        </div>
-        <div class="channel-info">
-            <div class="channel-name" title="${channel.name}">${channel.name}</div>
-            <div class="channel-meta">
-                ${categoryHTML}
-                ${countryHTML}
-            </div>
-        </div>
-    `;
-    
-    // Add event listeners using event delegation for better performance
-    card.addEventListener('click', (e) => {
-        if (!e.target.closest('.favorite-icon')) {
-            playChannel(channel);
+    // Favorite button
+    const favBtn = document.createElement('button');
+    favBtn.className = 'favorite-icon';
+    if (favorites.includes(channel.id)) {
+        favBtn.classList.add('active');
+    }
+    favBtn.innerHTML = favorites.includes(channel.id) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+    favBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Add heartbeat animation
+        favBtn.style.animation = 'heartBeat 0.3s ease';
+        setTimeout(() => {
+            favBtn.style.animation = '';
+        }, 300);
+        
+        toggleFavorite(channel.id);
+        
+        // Update the button state based on the current favorites array
+        if (favorites.includes(channel.id)) {
+            favBtn.classList.add('active');
+            favBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        } else {
+            favBtn.classList.remove('active');
+            favBtn.innerHTML = '<i class="far fa-heart"></i>';
         }
     });
     
-    // Handle favorite button clicks
-    const favBtn = card.querySelector('.favorite-icon');
-    if (favBtn) {
-        favBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            
-            // Add heartbeat animation
-            favBtn.style.animation = 'heartBeat 0.3s ease';
-            setTimeout(() => {
-                favBtn.style.animation = '';
-            }, 300);
-            
-            toggleFavorite(channel.id);
-        });
+    if (channel.logo) {
+        const img = document.createElement('img');
+        img.src = channel.logo;
+        img.alt = channel.name;
+        img.loading = 'lazy';
+        img.onerror = () => {
+            logoDiv.classList.add('no-logo');
+            logoDiv.innerHTML = '<i class="fas fa-tv"></i>';
+            logoDiv.appendChild(favBtn);
+        };
+        logoDiv.appendChild(img);
+    } else {
+        logoDiv.classList.add('no-logo');
+        logoDiv.innerHTML = '<i class="fas fa-tv"></i>';
     }
+    
+    logoDiv.appendChild(favBtn);
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'channel-info';
+    
+    const name = document.createElement('div');
+    name.className = 'channel-name';
+    name.textContent = channel.name;
+    name.title = channel.name;
+    
+    const meta = document.createElement('div');
+    meta.className = 'channel-meta';
+    
+    if (channel.categories && channel.categories.length > 0) {
+        const categoryTag = document.createElement('span');
+        categoryTag.className = 'channel-tag';
+        categoryTag.textContent = channel.categories[0];
+        meta.appendChild(categoryTag);
+    }
+    
+    if (channel.countries && channel.countries.length > 0) {
+        const countryDiv = document.createElement('div');
+        countryDiv.className = 'channel-country';
+        const countryCode = channel.countries[0].toLowerCase();
+        countryDiv.innerHTML = `
+            <span class="country-flag">${getCountryFlag(countryCode)}</span>
+            <span>${channel.countries[0]}</span>
+        `;
+        meta.appendChild(countryDiv);
+    }
+    
+    infoDiv.appendChild(name);
+    infoDiv.appendChild(meta);
+    
+    card.appendChild(logoDiv);
+    card.appendChild(infoDiv);
+    
+    card.addEventListener('click', () => playChannel(channel));
     
     return card;
 }
@@ -1151,15 +809,9 @@ function showLoading(show) {
     }
 }
 
-// Show toast notification with throttling
-let toastTimeout;
+// Show toast notification
 function showToast(message, type = 'info') {
     if (!toast) return;
-    
-    // Clear previous timeout to prevent spam
-    if (toastTimeout) {
-        clearTimeout(toastTimeout);
-    }
     
     const toastIcon = toast.querySelector('.toast-icon');
     const toastMessage = toast.querySelector('.toast-message');
@@ -1169,16 +821,17 @@ function showToast(message, type = 'info') {
     toast.className = `toast ${type}`;
     toastMessage.textContent = message;
     
-    // Use CSS classes instead of changing innerHTML for better performance
-    toastIcon.className = `toast-icon fas ${
-        type === 'success' ? 'fa-check-circle' : 
-        type === 'error' ? 'fa-exclamation-circle' : 
-        'fa-info-circle'
-    }`;
+    if (type === 'success') {
+        toastIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+    } else if (type === 'error') {
+        toastIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+    } else {
+        toastIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+    }
     
     toast.classList.remove('hidden');
     
-    toastTimeout = setTimeout(() => {
+    setTimeout(() => {
         toast.classList.add('hidden');
     }, 3000);
 }

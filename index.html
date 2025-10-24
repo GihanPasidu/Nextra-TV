@@ -7,11 +7,10 @@
     <meta name="description" content="Watch thousands of free live TV channels from around the world. Stream news, sports, entertainment, and more with Free TV by CloudNextra Solutions.">
     <meta name="keywords" content="free tv, live tv, iptv, streaming, online television, free channels">
     <link rel="stylesheet" href="styles.css">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap"></noscript>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
+<<<<<<< HEAD
     <link rel="manifest" href="manifest.json">
     <style>
         /* Critical CSS for fast initial render */
@@ -52,12 +51,10 @@
             pointer-events: none;
         }
     </style>
+=======
+>>>>>>> parent of ea432a3 (update)
 </head>
 <body>
-    <!-- Preloader -->
-    <div id="preloader" class="preloader">
-        <div class="preloader-spinner"></div>
-    </div>
     <header>
         <div class="container">
             <div class="header-left">
@@ -263,22 +260,19 @@
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js" defer></script>
-    <script src="script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js"></script>
     <script>
-        // Preload critical resources
-        window.addEventListener('load', function() {
-            // Preload fallback HLS.js if needed
-            if (typeof Hls === 'undefined') {
-                console.log('Loading HLS.js fallback...');
-                const fallbackScript = document.createElement('script');
-                fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
-                fallbackScript.onerror = function() {
-                    console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
-                };
-                document.head.appendChild(fallbackScript);
-            }
-        });
+        // Fallback CDN for HLS.js if primary fails
+        if (typeof Hls === 'undefined') {
+            console.log('Primary HLS.js CDN failed, trying fallback...');
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
+            fallbackScript.onerror = function() {
+                console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
+            };
+            document.head.appendChild(fallbackScript);
+        }
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
