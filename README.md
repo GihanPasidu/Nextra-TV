@@ -5,7 +5,7 @@ A professional, fast-loading TV streaming website featuring ALL IPTV channels fr
 ## ✨ Features
 
 ### 🎯 Core Features
-- **All IPTV Channels** - Displays all available channels from https://iptv-org.github.io/iptv/index.m3u
+- **All IPTV Channels** - Displays all available channels
 - **Fast Loading** - Optimized for speed with caching and lazy loading
 - **Professional Design** - Modern dark-themed UI with smooth animations
 - **Responsive** - Works perfectly on desktop, tablet, and mobile devices
@@ -122,9 +122,6 @@ Based on Dialog TV's official lineup from their website:
 - Edge (Latest)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 
-### API Source
-- **IPTV-ORG** - Free, regularly updated M3U playlist
-- URL: `https://iptv-org.github.io/iptv/index.m3u`
 
 ## 🎮 Features Explained
 
@@ -233,10 +230,6 @@ Nextra TV/
 - 📱 **Add to home** - On mobile, add to home screen for app-like experience
 - 🔄 **Refresh occasionally** - Get the latest channel list periodically
 
-## 📄 License
-
-This project uses data from IPTV-ORG (https://iptv-org.github.io/iptv/), which is maintained by a community of developers.
-
 ## ❓ FAQ
 
 **Q: Are these channels legal?**
@@ -244,9 +237,6 @@ A: This application simply displays publicly available M3U playlists. It's your 
 
 **Q: Can I download channels?**
 A: The application is designed for streaming only. Recording streams may violate terms of service.
-
-**Q: Why only Dialog TV channels?**
-A: The app is configured to filter and display only the official 125 Dialog TV channels based on their official channel lineup at https://www.dialog.lk/dialog-television/channels. This provides a curated, legal viewing experience with all Dialog TV offerings.
 
 **Q: Which channels are included?**
 A: All 125 official Dialog TV channels including:
