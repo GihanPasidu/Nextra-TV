@@ -207,49 +207,10 @@ function parseExtinf(line) {
     return channel;
 }
 
-// Filter Dialog TV Channels Only - STRICT FILTERING
+// Show All Channels (No Filtering)
 function filterDialogChannels(channels) {
-    return channels.filter(channel => {
-        const channelName = channel.name.toLowerCase().trim();
-        const channelGroup = (channel.group || '').toLowerCase().trim();
-        
-        // STRICT: Only match if group is explicitly Dialog or Sri Lanka
-        const isDialogGroup = channelGroup.includes('dialog tv') || 
-                            channelGroup.includes('sri lanka') ||
-                            channelGroup === 'srilankan' ||
-                            channelGroup === 'dialog';
-        
-        // If group is explicitly Dialog/Sri Lanka, include it
-        if (isDialogGroup) {
-            return true;
-        }
-        
-        // Otherwise, check for EXACT matches with Dialog channels only
-        const exactMatch = CONFIG.dialogChannels.some(dialogChannel => {
-            const dialogLower = dialogChannel.toLowerCase().trim();
-            
-            // Exact match or very close match only
-            if (channelName === dialogLower) return true;
-            if (channelName === dialogLower + ' hd') return true;
-            if (channelName === dialogLower.replace(' tv', '')) return true;
-            
-            // For specific channel patterns
-            const channelWords = channelName.split(/[\s-]+/);
-            const dialogWords = dialogLower.split(/[\s-]+/);
-            
-            // Must match at least 2 significant words for multi-word channels
-            if (dialogWords.length >= 2) {
-                const matchCount = dialogWords.filter(word => 
-                    word.length > 2 && channelWords.includes(word)
-                ).length;
-                return matchCount >= 2;
-            }
-            
-            return false;
-        });
-        
-        return exactMatch;
-    }).sort((a, b) => a.name.localeCompare(b.name));
+    // Return all channels without filtering
+    return channels.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // Determine Category

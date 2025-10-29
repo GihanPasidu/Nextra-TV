@@ -1,11 +1,11 @@
-# 📺 Nextra TV - Official Dialog TV Channels Streaming
+# 📺 Nextra TV - All IPTV Channels Streaming
 
-A professional, fast-loading TV streaming website featuring official Dialog TV channels (125 channels) with a modern UI built with HTML, CSS, and JavaScript.
+A professional, fast-loading TV streaming website featuring ALL IPTV channels from IPTV-ORG with a modern UI built with HTML, CSS, and JavaScript.
 
 ## ✨ Features
 
 ### 🎯 Core Features
-- **Official Dialog TV 125 Channels Only** - Automatically filters and displays only official Dialog TV channels from https://www.dialog.lk/dialog-television/channels
+- **All IPTV Channels** - Displays all available channels from https://iptv-org.github.io/iptv/index.m3u
 - **Fast Loading** - Optimized for speed with caching and lazy loading
 - **Professional Design** - Modern dark-themed UI with smooth animations
 - **Responsive** - Works perfectly on desktop, tablet, and mobile devices
@@ -52,7 +52,7 @@ Simply open `index.html` in any modern web browser:
 ## 📊 Statistics
 
 The dashboard shows:
-- **Total Channels** - Number of Dialog TV channels available (125 official channels)
+- **Total Channels** - Number of IPTV channels available (thousands of channels worldwide)
 - **Categories** - Number of different channel categories
 
 ## 📺 Channel Categories (125 Channels)
