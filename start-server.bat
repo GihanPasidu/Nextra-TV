@@ -1,24 +1,22 @@
 @echo off
+REM Simple HTTP Server for Nextra TV
+REM This script uses Python to serve the website locally
+
 echo.
-echo ==========================================
-echo   Free TV - Local Development Server
-echo ==========================================
+echo ╔════════════════════════════════════════╗
+echo ║       Nextra TV - Local Server         ║
+echo ╚════════════════════════════════════════╝
 echo.
 
-REM Check if Python is available
-python --version >nul 2>&1
+python -m http.server 8000 --directory .
+
 if %errorlevel% neq 0 (
-    echo ❌ Python is not installed or not in PATH
-    echo 💡 Please install Python from https://python.org
-    echo    or open index.html directly in your browser
+    echo.
+    echo Error: Python not found or not installed.
+    echo.
+    echo You can still use the website by:
+    echo 1. Simply opening index.html in your browser, OR
+    echo 2. Using any other local server (e.g., Live Server extension in VS Code)
+    echo.
     pause
-    exit /b 1
 )
-
-echo ✅ Python found! Starting server...
-echo.
-
-REM Start the Python server
-python serve.py
-
-pause

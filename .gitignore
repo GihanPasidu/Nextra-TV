@@ -1,15 +1,21 @@
-# Free TV Deployment Notes
-
-## Files to exclude from deployment
+# Node modules (if using npm in future)
 node_modules/
-.DS_Store
 *.log
-*.env
-.vscode/
-.git/
-serve.py
-start-server.bat
 
-# Build artifacts (if any)
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
 dist/
 build/
+
+# Environment
+.env
+.env.local

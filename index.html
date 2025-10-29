@@ -3,385 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free TV - Live Television Streaming | CloudNextra Solutions</title>
-    <meta name="description" content="Watch thousands of free live TV channels from around the world. Stream news, sports, entertainment, and more with Free TV by CloudNextra Solutions.">
-    <meta name="keywords" content="free tv, live tv, iptv, streaming, online television, free channels">
+    <title>Nextra TV - Official Dialog TV Channels</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23FF6B35' width='100' height='100'/><text x='50' y='70' font-size='60' fill='white' text-anchor='middle' font-weight='bold'>TV</text></svg>">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Preload critical resources -->
-    <link rel="preload" href="styles.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="styles.css"></noscript>
-    <link rel="preload" href="script.js" as="script">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap"></noscript>
-    
-    <!-- DNS prefetch for external resources -->
-    <link rel="dns-prefetch" href="//iptv-org.github.io">
-    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    
-    <style>
-        /* Critical above-the-fold CSS - inline for fastest render */
-        body { 
-            margin: 0; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f1f5f9;
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header critical styles */
-        header {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            padding: 20px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 200;
-        }
-        
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .logo h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #f1f5f9;
-            letter-spacing: -0.5px;
-            margin: 0;
-        }
-        
-        .tagline {
-            font-size: 0.8rem;
-            color: #cbd5e1;
-            font-weight: 300;
-        }
-        
-        /* Preloader styles */
-        .preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-        .preloader.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
-        .preloader-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #334155;
-            border-top: 3px solid #2563eb;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        .preloader-text {
-            color: #f1f5f9;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .preloader-subtitle {
-            color: #cbd5e1;
-            font-size: 0.85rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Hide non-critical content initially */
-        .main-nav, main, footer {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .content-loaded .main-nav,
-        .content-loaded main,
-        .content-loaded footer {
-            opacity: 1;
-        }
-    </style>
 </head>
 <body>
-    <!-- Preloader -->
-    <div id="preloader" class="preloader">
-        <div class="preloader-spinner"></div>
-        <div class="preloader-text">Free TV</div>
-        <div class="preloader-subtitle">Loading channels...</div>
-    </div>
-
-    <header>
-        <div class="container">
-            <div class="header-left">
-                <div class="logo">
-                    <i class="fas fa-tv"></i>
-                    <div>
-                        <h1>Free TV</h1>
-                        <div class="tagline">by CloudNextra Solutions</div>
-                    </div>
-                </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">📺</div>
+                <h1>Nextra TV</h1>
             </div>
-            <div class="header-right">
-                <button id="favoriteBtn" class="header-btn" title="My Favorites">
-                    <i class="fas fa-heart"></i>
-                    <span class="favorites-count">0</span>
-                </button>
-                <button id="themeToggle" class="header-btn" title="Toggle Theme">
-                    <i class="fas fa-moon"></i>
+            <div class="header-controls">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search channels..."
+                        class="search-input"
+                    >
+                    <span class="search-icon">🔍</span>
+                </div>
+                <button id="loadingIndicator" class="loading-btn">
+                    <span class="spinner"></span>
+                    <span>Loading Channels...</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <nav class="main-nav">
-        <div class="container">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search channels by name...">
-                <button id="clearSearch" class="clear-search hidden">
-                    <i class="fas fa-times"></i>
-                </button>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Stats -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-value" id="channelCount">0</span>
+                <span class="stat-label">Channels</span>
             </div>
-            <div class="filter-controls">
-                <select id="categoryFilter">
-                    <option value="">All Categories</option>
-                </select>
-                <select id="countryFilter">
-                    <option value="">All Countries</option>
-                </select>
-                <select id="languageFilter">
-                    <option value="">All Languages</option>
-                </select>
-                <button id="clearFilters" class="clear-filters-btn">
-                    <i class="fas fa-filter-circle-xmark"></i> Clear Filters
-                </button>
+            <div class="stat-item">
+                <span class="stat-value" id="categoryCount">0</span>
+                <span class="stat-label">Categories</span>
             </div>
         </div>
-    </nav>
 
-    <main>
-        <div class="container">
-            <div class="content-wrapper">
-                <!-- Sidebar for categories -->
-                <aside class="sidebar">
-                    <div class="sidebar-section">
-                        <h3><i class="fas fa-star"></i> Quick Access</h3>
-                        <ul class="quick-access-list">
-                            <li id="showAllChannels" class="active">
-                                <i class="fas fa-list"></i> All Channels
-                            </li>
-                            <li id="showFavorites">
-                                <i class="fas fa-heart"></i> Favorites
-                                <span class="badge">0</span>
-                            </li>
-                            <li id="showRecent">
-                                <i class="fas fa-history"></i> Recently Watched
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="sidebar-section">
-                        <h3><i class="fas fa-folder-open"></i> Categories</h3>
-                        <ul id="categoryList" class="category-list"></ul>
-                    </div>
-                </aside>
+        <!-- Filters -->
+        <div class="filters-container">
+            <button class="filter-btn active" data-filter="all">All Channels</button>
+            <button class="filter-btn" data-filter="sports">⚽ Sports</button>
+            <button class="filter-btn" data-filter="movies">🎬 Movies</button>
+            <button class="filter-btn" data-filter="news">📰 News</button>
+            <button class="filter-btn" data-filter="kids">🎨 Kids</button>
+            <button class="filter-btn" data-filter="music">🎵 Music</button>
+        </div>
 
-                <!-- Main content area -->
-                <div class="main-content">
-                    <!-- Video player -->
-                    <div id="playerContainer" class="player-container hidden">
-                        <div class="player-header">
-                            <div class="player-title-section">
-                                <h2 id="currentChannelName">Select a channel to start watching</h2>
-                                <button id="favoriteCurrentChannel" class="favorite-btn" title="Add to favorites">
-                                    <i class="far fa-heart"></i>
-                                </button>
-                            </div>
-                            <div class="player-controls-header">
-                                <button id="pictureInPicture" class="player-control-btn" title="Picture in Picture">
-                                    <i class="fas fa-compress-arrows-alt"></i>
-                                </button>
-                                <button id="fullscreenBtn" class="player-control-btn" title="Fullscreen">
-                                    <i class="fas fa-expand"></i>
-                                </button>
-                                <button id="closePlayer" class="close-btn">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="video-wrapper">
-                            <video id="videoPlayer" controls autoplay playsinline>
-                                Your browser does not support the video tag.
-                            </video>
-                            <div id="playerError" class="player-error hidden">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <p>Unable to load this channel. Please try another one.</p>
-                                <button id="retryStream" class="retry-btn">
-                                    <i class="fas fa-redo"></i> Try Again
-                                </button>
-                            </div>
-                            <div id="loadingOverlay" class="loading-overlay hidden">
-                                <div class="spinner"></div>
-                                <p>Loading stream...</p>
-                            </div>
-                        </div>
-                        <div class="player-info">
-                            <div class="info-tags" id="channelInfo"></div>
-                            <div class="stream-quality">
-                                <label><i class="fas fa-signal"></i> Quality:</label>
-                                <select id="streamQuality">
-                                    <option value="0">Auto</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <p id="errorText"></p>
+        </div>
 
-                    <!-- Channel grid -->
-                    <div class="channels-header">
-                        <div class="header-title">
-                            <h2 id="sectionTitle">Available Channels</h2>
-                            <p id="sectionSubtitle" class="section-subtitle"></p>
-                        </div>
-                        <div class="header-actions">
-                            <div class="sort-control">
-                                <label><i class="fas fa-sort"></i></label>
-                                <select id="sortBy">
-                                    <option value="name-asc">A-Z</option>
-                                    <option value="name-desc">Z-A</option>
-                                    <option value="country-asc">Country A-Z</option>
-                                    <option value="recent">Recently Added</option>
-                                </select>
-                            </div>
-                            <span id="channelCount" class="channel-count">Loading...</span>
-                        </div>
-                    </div>
-                    
-                    <div id="loadingSpinner" class="loading-spinner">
-                        <div class="spinner-large"></div>
-                        <p>Loading channels...</p>
-                        <small>Please wait while we fetch the latest channels</small>
-                    </div>
+        <!-- Channels Grid -->
+        <div class="channels-container" id="channelsContainer">
+            <!-- Loading skeleton will be shown here -->
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+            <div class="skeleton-loader"></div>
+        </div>
 
-                    <div id="channelGrid" class="channel-grid"></div>
-
-                    <div id="noResults" class="no-results hidden">
-                        <i class="fas fa-search"></i>
-                        <h3>No channels found</h3>
-                        <p>Try adjusting your search or filter criteria</p>
-                        <button id="resetFiltersBtn" class="reset-btn">
-                            <i class="fas fa-redo"></i> Reset All Filters
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <!-- No Results -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <p>No channels found matching your search.</p>
         </div>
     </main>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>About Free TV</h3>
-                    <p>Your free source for live television streaming from around the world.</p>
-                    <p class="copyright">&copy; 2025 CloudNextra Solutions. All rights reserved.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Information</h3>
-                    <p>Channels provided by <a href="https://github.com/iptv-org/iptv" target="_blank">IPTV-org</a></p>
-                    <p>Open source project for free and legal IPTV channels</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Contact</h3>
-                    <p><i class="fas fa-envelope"></i> info@cloudnextra.com</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
+    <!-- Modal for Video Player -->
+    <div id="playerModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="player-container">
+                <video id="videoPlayer" controls playsinline>
+                    <source src="" type="application/x-mpegURL">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="channel-info">
+                <h2 id="modalChannelName"></h2>
+                <p id="modalChannelGroup"></p>
             </div>
         </div>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden">
-        <i class="toast-icon"></i>
-        <span class="toast-message"></span>
     </div>
 
-    <!-- Scroll to Top Button -->
-    <button id="scrollToTop" class="scroll-to-top hidden">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Nextra TV - Official Dialog TV Channels (125 Channels) | Powered by IPTV-ORG</p>
+    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.12/dist/hls.min.js" defer></script>
-    <script src="performance.js"></script>
-    <script>
-        // Non-blocking font awesome loading
-        function loadFontAwesome() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-            document.head.appendChild(link);
-        }
-        
-        // Load font awesome after initial render
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadFontAwesome);
-        } else {
-            loadFontAwesome();
-        }
-        
-        // Fallback CDN for HLS.js if primary fails
-        function checkHLS() {
-            if (typeof Hls === 'undefined') {
-                console.log('Primary HLS.js CDN failed, trying fallback...');
-                const fallbackScript = document.createElement('script');
-                fallbackScript.src = 'https://unpkg.com/hls.js@latest/dist/hls.min.js';
-                fallbackScript.onerror = function() {
-                    console.warn('HLS.js CDN failed to load. Video streaming may not work for some formats.');
-                };
-                document.head.appendChild(fallbackScript);
-            }
-        }
-        
-        // Check HLS after DOM is ready
-        setTimeout(checkHLS, 100);
-    </script>
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>

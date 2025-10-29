@@ -1,192 +1,272 @@
-# Free TV - Live Television Streaming
+# 📺 Nextra TV - Official Dialog TV Channels Streaming
 
-A modern, responsive web application for streaming live TV channels from around the world.
-
-**Created by CloudNextra Solutions**
+A professional, fast-loading TV streaming website featuring official Dialog TV channels (125 channels) with a modern UI built with HTML, CSS, and JavaScript.
 
 ## ✨ Features
 
-- 🌍 Access to thousands of free live TV channels worldwide
-- 📺 Modern, intuitive user interface with professional design
-- 🔍 Advanced search and filtering capabilities
-- 📱 Fully responsive design (mobile, tablet, desktop)
-- 🎨 Beautiful dark/light theme with smooth animations
-- ⭐ Favorites system with persistent storage
-- 🕒 Recently watched channels tracking
-- 🎯 Filter by category, country, and language
-- ▶️ Built-in video player with HLS support
-- 📺 Picture-in-Picture and Fullscreen support
-- 🔊 Stream quality selector
-- 📢 Toast notifications for user feedback
-- 🚀 Fast and lightweight with lazy loading
+### 🎯 Core Features
+- **Official Dialog TV 125 Channels Only** - Automatically filters and displays only official Dialog TV channels from https://www.dialog.lk/dialog-television/channels
+- **Fast Loading** - Optimized for speed with caching and lazy loading
+- **Professional Design** - Modern dark-themed UI with smooth animations
+- **Responsive** - Works perfectly on desktop, tablet, and mobile devices
+- **Search Functionality** - Quickly find channels by name
+- **Category Filtering** - Browse channels by categories (Sports, Movies, News, Kids, Music)
+- **Live Playback** - Stream channels directly in the browser
 
-## Technologies Used
+### 🚀 Performance Optimizations
+- **Caching** - Channels are cached for 1 hour to reduce API calls
+- **Lazy Loading** - Images load only when visible
+- **Minimal Dependencies** - Pure HTML, CSS, and JavaScript (no frameworks)
+- **Smooth Animations** - GPU-accelerated CSS transitions
+- **Efficient Rendering** - Optimized DOM manipulation
 
+### 🎨 Design Features
+- **Modern UI** - Dark theme with vibrant accents
+- **Smooth Transitions** - Professional hover effects and animations
+- **Gradient Backgrounds** - Eye-catching visual design
+- **Skeleton Loaders** - Better loading experience
+- **Mobile-First** - Optimized for all screen sizes
+- **Accessibility** - Semantic HTML and keyboard shortcuts
+
+## 📋 How to Use
+
+### 1. **Open the Website**
+Simply open `index.html` in any modern web browser:
+- Right-click → Open with Browser
+- Or drag `index.html` to your browser
+
+### 2. **Browse Channels**
+- **Search**: Use the search bar at the top to find channels by name
+- **Filter**: Click category buttons to filter by type (Sports, Movies, News, etc.)
+- **View All**: Click "All Channels" to see the complete list
+
+### 3. **Watch Channels**
+- **Click on a channel card** to start playing
+- **Click the play button** on the channel card
+- **Use video controls** to pause, volume, or fullscreen
+
+### 4. **Keyboard Shortcuts**
+- **ESC** - Close the video player
+- **SPACE** - Play/Pause when video player is open
+
+## 📊 Statistics
+
+The dashboard shows:
+- **Total Channels** - Number of Dialog TV channels available (125 official channels)
+- **Categories** - Number of different channel categories
+
+## 📺 Channel Categories (125 Channels)
+
+Based on Dialog TV's official lineup from their website:
+
+### 🇱🇰 Sri Lankan Channels (20+ channels)
+- **News**: Sirasa, Hiru, Derana, ITN, News First, Siyatha News, Capital TV
+- **Entertainment**: Sirasa TV, Hiru TV, Derana, ITN, Rupavahini, TV1
+- **Regional**: Shakthi TV, Vasantham TV, Charana TV, Supreme TV, Nethra TV
+- **Specialty**: Buddhist TV, Shraddha TV, Swarnavahini, Eye TV
+
+### 🎬 Entertainment Channels (30+ channels)
+- **Hindi**: Zee TV, Star Plus, Colors, Sony Entertainment, SAB TV, Star Utsav
+- **Tamil**: Sun TV, Star Vijay, Zee Tamil, Kalaignar, Jaya TV, Raj TV, Polimer TV
+- **Telugu**: ETV Plus, ETV Telugu, Gemini, Maa TV, Zee Telugu
+- **General**: Thanthi TV, Vendhar TV, Captain TV, Malai Murasu
+
+### 🎥 Movie Channels (25+ channels)
+- **Hindi Movies**: Zee Cinema, Star Gold, Sony Max, &Pictures, Movies Now
+- **Regional Movies**: Zee Thirai, Jaya Movie, Gemini Movies, Star Gold Select
+- **Premium**: HBO, Star Movies, &Prive, Fox Movies, Fox Action Movies
+- **Bollywood**: Zee Bollywood, Zee Classic, B4U Movies, Colors Cineplex
+
+### ⚽ Sports Channels (15+ channels)
+- **Star Sports**: Star Sports 1, 2, 3, Select, First
+- **Sony Sports**: Sony Six, Sony Ten 1, 2, 3, Sony Ten Golf, Sony ESPN
+- **Others**: Ten Sports, Euro Sport, DD Sports, WWE Network, DSport
+
+### 📰 News Channels (20+ channels)
+- **International**: CNN, BBC World News, Al Jazeera, Sky News, France 24, DW, CGTN
+- **Sri Lankan**: News First, Hiru News, Derana News, Sirasa News, ITN News, Siyatha News
+- **Indian**: Times Now, News 18, Republic TV, NDTV 24x7, Zee News, Aaj Tak
+- **Regional**: News7 Tamil, Puthiya Thalaimurai, India Today
+
+### 🎨 Kids & Family (13+ channels)
+- **Cartoons**: Cartoon Network, Nickelodeon, Nick Jr, Pogo, Sonic
+- **Kids**: Disney Channel, Disney Junior, Discovery Kids, Hungama
+- **Toddlers**: Baby TV, Chutti TV, Kochu TV
+
+### 🎵 Music Channels (10+ channels)
+- **International**: MTV, VH1, Zoom, MTV Beats
+- **Indian**: 9XM, 9X Jalwa, 9X Tashan, Mastiii, Zing
+- **Regional**: Sirippoli, Sun Music, Isai Aruvi, B4U Music, Raj Musix
+
+### 📚 Knowledge & Documentary (12+ channels)
+- **Discovery**: Discovery Channel, Discovery Science, Discovery Turbo
+- **Wildlife**: Animal Planet, National Geographic, Nat Geo Wild
+- **Lifestyle**: TLC, Travel XP, Fox Life, Living Foodz
+- **Educational**: History TV18, Sony BBC Earth, Epic TV
+
+### 🌟 Lifestyle & Premium (5+ channels)
+- Star World, Comedy Central, AXN, Warner TV
+- Fashion TV, E24, Romance TV, Care World, Goodness TV
+
+## 🔧 Technical Details
+
+### Technology Stack
 - **HTML5** - Semantic markup
-- **CSS3** - Modern styling with CSS Grid and Flexbox
-- **JavaScript (ES6+)** - Dynamic functionality
-- **HLS.js** - HTTP Live Streaming support
-- **Font Awesome** - Icons
-- **Google Fonts** - Poppins font family
-- **IPTV-org API** - Channel data source
+- **CSS3** - Modern styling with animations
+- **JavaScript (Vanilla)** - No frameworks, pure ES6+
 
-## Data Source
+### Browser Support
+- Chrome (Latest)
+- Firefox (Latest)
+- Safari (Latest)
+- Edge (Latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-This project uses the [IPTV-org](https://github.com/iptv-org/iptv) project, which provides a collection of publicly available IPTV channels from around the world.
+### API Source
+- **IPTV-ORG** - Free, regularly updated M3U playlist
+- URL: `https://iptv-org.github.io/iptv/index.m3u`
 
-## Getting Started
+## 🎮 Features Explained
 
-### 🚀 Quick Start (Recommended)
+### Category Detection
+The app automatically categorizes channels based on keywords:
+- **⚽ Sports** - Cricket, football, soccer, sports channels
+- **🎬 Movies** - Movie channels, cinema, HBO
+- **📰 News** - News networks, CNN, BBC
+- **🎨 Kids** - Cartoon, children's content
+- **🎵 Music** - Music channels, VEVO
 
-**Option 1: Local Server (Recommended for full functionality)**
-1. **Windows Users**: Double-click `start-server.bat`
-2. **All Users**: Run `python serve.py` in the project directory
-3. Open `http://localhost:8000` in your browser
-4. Enjoy full functionality including API calls and heart animations!
+### Caching System
+- Channels are cached in browser's localStorage
+- Cache expires after 1 hour
+- Reduces bandwidth and speeds up loading
 
-**Option 2: Direct File Access**
-1. **Clone or download this repository**
-2. **Open the project**: Simply open `index.html` in a modern web browser
-3. **Start watching**: Browse channels, search, and enjoy!
+### Error Handling
+- Graceful error messages if channels fail to load
+- Offline channel detection
+- Automatic retry suggestions
 
-> 💡 **Note**: The local server method ensures all features work correctly, including API calls to IPTV-org
+## 📱 Responsive Design
 
-### 🧪 Testing
+**Desktop View:**
+- 6-7 channels per row
+- Full-width search and filters
 
-- Open `heart-test.html` to test heart functionality and animations
-- Use the server method for comprehensive testing
-- All heart features should work smoothly with proper animations
+**Tablet View:**
+- 3-4 channels per row
+- Optimized touch interactions
 
-### 🛠️ Troubleshooting
+**Mobile View:**
+- 2 channels per row
+- Touch-friendly buttons and controls
 
-**If hearts/favorites aren't working:**
-1. Ensure JavaScript is enabled in your browser
-2. Check browser console for any errors (F12)
-3. Try using the local server method instead of direct file access
-4. Clear browser cache and localStorage
+## 🔐 Privacy & Performance
 
-**If IPTV streams aren't loading:**
-1. Check your internet connection
-2. Some streams may be geo-restricted
-3. Try different channels from various countries
-4. Use the local server for better API access
+- ✅ No tracking or analytics
+- ✅ No ads or pop-ups
+- ✅ All processing done locally in browser
+- ✅ No data stored on servers
+- ✅ Minimal network requests
 
-## Project Structure
+## 🛠️ Customization
+
+### Add More Filters
+Edit the `CONFIG` object in `script.js`:
+```javascript
+CONFIG.categoryKeywords = {
+    sports: ['sport', 'football', 'cricket'],
+    // Add more categories here
+}
+```
+
+### Change Colors
+Edit CSS variables in `styles.css`:
+```css
+:root {
+    --primary-color: #FF6B35;
+    --secondary-color: #004E89;
+    /* Modify colors here */
+}
+```
+
+### Adjust Refresh Rate
+Change cache time in `script.js`:
+```javascript
+CONFIG.cacheTime = 3600000; // 1 hour in milliseconds
+```
+
+## 🐛 Troubleshooting
+
+**Issue:** "Failed to load channels"
+- **Solution:** Check internet connection and refresh the page
+
+**Issue:** Video won't play
+- **Solution:** The stream may be offline. Try another channel
+
+**Issue:** Slow loading
+- **Solution:** Clear browser cache and refresh. First load may take longer
+
+**Issue:** No channels showing
+- **Solution:** Check if you're searching with specific keywords. Try "All Channels"
+
+## 📝 File Structure
 
 ```
-free-tv/
+Nextra TV/
 ├── index.html          # Main HTML file
-├── styles.css          # All styling
-├── script.js           # Application logic
+├── styles.css          # All styling and animations
+├── script.js           # JavaScript logic and data fetching
 └── README.md          # This file
 ```
 
-## Features in Detail
+## 🚀 Getting Started
 
-### 🔍 Advanced Search & Filtering
-- Real-time search across channel names and alternative names
-- Filter by category (News, Sports, Entertainment, etc.)
-- Filter by country with flag display
-- Filter by language
-- Sort channels alphabetically or by country
-- Clear all filters with one click
+1. **Extract files** to any folder
+2. **Open `index.html`** in your web browser
+3. **Wait for channels to load** (first time takes ~5-10 seconds)
+4. **Start watching!** 📺
 
-### 📺 Professional Video Player
-- Supports HLS (m3u8) streams with quality selection
-- Supports direct video streams
-- Picture-in-Picture mode support
-- Fullscreen mode with keyboard shortcuts
-- Automatic stream detection and error recovery
-- Loading overlays and retry functionality
-- Stream quality selector for HLS streams
+## 💡 Tips
 
-### ⭐ Favorites & History
-- Add/remove channels from favorites
-- Persistent favorites storage
-- Recently watched channels tracking
-- Quick access sidebar for favorites and recent
-- Favorites counter in header
+- 💾 **Bookmark the file** for quick access
+- 🎬 **Fullscreen mode** - Press F11 for immersive viewing
+- 📱 **Add to home** - On mobile, add to home screen for app-like experience
+- 🔄 **Refresh occasionally** - Get the latest channel list periodically
 
-### 🎨 Theme & Design
-- Dark and light theme toggle
-- Professional gradient design
-- Smooth animations and transitions
-- Card hover effects with depth
-- Professional loading states
-- Toast notifications for user feedback
+## 📄 License
 
-### 📱 Responsive Design
-- Mobile-first approach
-- Adapts to all screen sizes
-- Touch-friendly interface
-- Optimized performance with lazy loading
-- Scroll-to-top functionality
+This project uses data from IPTV-ORG (https://iptv-org.github.io/iptv/), which is maintained by a community of developers.
 
-## Browser Support
+## ❓ FAQ
 
-- ✅ Chrome (recommended)
-- ✅ Firefox
-- ✅ Safari
-- ✅ Edge
-- ✅ Opera
+**Q: Are these channels legal?**
+A: This application simply displays publicly available M3U playlists. It's your responsibility to ensure legal compliance in your region.
 
-## Limitations
+**Q: Can I download channels?**
+A: The application is designed for streaming only. Recording streams may violate terms of service.
 
-- Stream availability depends on the IPTV-org database
-- Some streams may not work due to geo-restrictions
-- Stream quality varies by source
-- Requires internet connection
+**Q: Why only Dialog TV channels?**
+A: The app is configured to filter and display only the official 125 Dialog TV channels based on their official channel lineup at https://www.dialog.lk/dialog-television/channels. This provides a curated, legal viewing experience with all Dialog TV offerings.
 
-## ✅ Current Features
+**Q: Which channels are included?**
+A: All 125 official Dialog TV channels including:
+- **20+ Sri Lankan channels** (Sirasa, Hiru, Derana, ITN, Rupavahini, News First, etc.)
+- **30+ Entertainment channels** (Zee TV, Star Plus, Colors, Sony, Sun TV, Star Vijay, etc.)
+- **25+ Movie channels** (Zee Cinema, Star Gold, Sony Max, HBO, Star Movies, etc.)
+- **15+ Sports channels** (Star Sports 1-3, Sony Six, Sony Ten 1-3, WWE, Euro Sport, etc.)
+- **20+ News channels** (CNN, BBC, Al Jazeera, Sky News, Times Now, NDTV, Republic TV, etc.)
+- **13+ Kids channels** (Cartoon Network, Disney, Nickelodeon, Pogo, Baby TV, etc.)
+- **10+ Music channels** (MTV, VH1, 9XM, Zoom, MTV Beats, Sirippoli, etc.)
+- **12+ Documentary channels** (Discovery, National Geographic, Animal Planet, History TV, etc.)
 
-- [x] Favorites/bookmarking system
-- [x] Recently watched channels
-- [x] Multiple stream quality options
-- [x] User preferences/settings with theme toggle
-- [x] Advanced search and filtering
-- [x] Picture-in-Picture support
-- [x] Fullscreen video player
-- [x] Toast notifications
+**Q: Are all 125 channels available for streaming?**
+A: The app will display all Dialog TV channels found in the IPTV source. Stream availability depends on the IPTV provider's live streams.
 
-## 🚀 Future Enhancements
-
-- [ ] Channel recommendations based on viewing history
-- [ ] EPG (Electronic Program Guide) integration
-- [ ] Chromecast support
-- [ ] Keyboard shortcuts for player controls
-- [ ] Export/import favorites
-- [ ] Channel rating system
-- [ ] Multi-language interface
-
-## Contributing
-
-This project was created by CloudNextra Solutions. If you'd like to contribute:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## License
-
-This project is open source and available under the MIT License.
-
-## Credits
-
-- **CloudNextra Solutions** - Development
-- **IPTV-org** - Channel data and streams
-- **Font Awesome** - Icons
-- **HLS.js** - Video streaming library
-
-## Disclaimer
-
-This application does not host any content. All streams are provided by third parties through the IPTV-org project. The availability and legality of streams may vary by region.
-
-## Contact
-
-For questions or support, please contact:
-- Email: info@cloudnextra.com
+**Q: Can I run this offline?**
+A: After initial load, channels are cached locally. However, the video streams require internet connection.
 
 ---
 
-**© 2025 CloudNextra Solutions. All rights reserved.**
+**Enjoy streaming!** 🎬📺
+
+For issues or suggestions, ensure your browser is up-to-date and try clearing cache.
