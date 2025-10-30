@@ -301,7 +301,10 @@ function playChannel(channel) {
     }
 
     elements.modalChannelName.textContent = channel.name;
-    elements.modalChannelGroup.textContent = channel.group || 'Dialog TV';
+    
+    // Set group text with fallback
+    const groupText = channel.group && channel.group.trim() !== '' ? channel.group : 'General';
+    elements.modalChannelGroup.textContent = groupText;
     
     // Set video source with HLS support
     const source = elements.videoPlayer.querySelector('source');

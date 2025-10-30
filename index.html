@@ -29,24 +29,16 @@
                     <span class="spinner"></span>
                     <span>Loading Channels...</span>
                 </button>
+                <div class="channel-counter">
+                    <span class="counter-value" id="channelCount">0</span>
+                    <span class="counter-label">Channels</span>
+                </div>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Stats -->
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-value" id="channelCount">0</span>
-                <span class="stat-label">Channels</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-value" id="categoryCount">0</span>
-                <span class="stat-label">Categories</span>
-            </div>
-        </div>
-
         <!-- Filters -->
         <div class="filters-container">
             <button class="filter-btn active" data-filter="all">All Channels</button>
@@ -84,6 +76,10 @@
         <div class="modal-content">
             <button class="modal-close">&times;</button>
             <div class="player-container">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span class="live-text">LIVE</span>
+                </div>
                 <video id="videoPlayer" controls playsinline>
                     <source src="" type="application/x-mpegURL">
                     Your browser does not support the video tag.
@@ -98,7 +94,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 Nextra TV - Premium IPTV Streaming Platform | Powered by CloudNextra Solutions</p>
+        <p>&copy; 2025 Nextra TV | Powered by CloudNextra Solutions</p>
     </footer>
 
     <script src="script.js"></script>
