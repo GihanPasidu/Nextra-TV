@@ -314,10 +314,23 @@ class IPTVManager {
         // Show modal
         modal.style.display = 'flex';
 
+        // For problematic streams, try with CORS proxy first
+        let streamUrl = url;
+        const useCorsProxy = false; // Set to true if direct access fails
+        
+        // If stream has known CORS issues, enable proxy
+        if (url.includes('sonyliv') || url.includes('sonyten') || 
+            name.toLowerCase().includes('sony') || 
+            name.toLowerCase().includes('ten sports')) {
+            // These streams often have CORS issues, but try direct first
+            console.log('Detected potentially geo-blocked stream:', name);
+        }
+
         // Check if HLS is supported
         if (Hls.isSupported()) {
             // Use HLS.js for browsers that don't natively support HLS
             this.hls = new Hls({
+                debug: false,
                 enableWorker: true,
                 lowLatencyMode: false,
                 backBufferLength: 90,
@@ -325,26 +338,34 @@ class IPTVManager {
                 maxMaxBufferLength: 600,
                 maxBufferSize: 60 * 1000 * 1000,
                 maxBufferHole: 0.5,
-                enableWorker: true,
                 manifestLoadingTimeOut: 20000,
                 manifestLoadingMaxRetry: 6,
                 manifestLoadingRetryDelay: 1000,
+                manifestLoadingMaxRetryTimeout: 64000,
                 levelLoadingTimeOut: 20000,
                 levelLoadingMaxRetry: 6,
                 levelLoadingRetryDelay: 1000,
+                levelLoadingMaxRetryTimeout: 64000,
                 fragLoadingTimeOut: 30000,
                 fragLoadingMaxRetry: 10,
                 fragLoadingRetryDelay: 1000,
+                fragLoadingMaxRetryTimeout: 64000,
                 startFragPrefetch: true,
                 testBandwidth: true,
                 progressive: true,
-                // Handle CORS by using credentials
+                // Disable strict checking for problematic streams
+                stretchShortVideoTrack: true,
+                maxAudioFramesDrift: 1,
+                forceKeyFrameOnDiscontinuity: true,
+                // Handle CORS - try without credentials
                 xhrSetup: function(xhr, url) {
-                    xhr.withCredentials = false; // Try without credentials first
+                    xhr.withCredentials = false;
+                    // Add referrer policy for some geo-blocked content
+                    xhr.setRequestHeader('Referer', '');
                 }
             });
 
-            this.hls.loadSource(url);
+            this.hls.loadSource(streamUrl);
             this.hls.attachMedia(videoPlayer);
 
             let retryCount = 0;
@@ -361,38 +382,51 @@ class IPTVManager {
             });
 
             this.hls.on(Hls.Events.ERROR, (event, data) => {
-                console.log('HLS Error details:', data.type, data.details, data.fatal);
+                console.log('HLS Error:', data.type, data.details, 'Fatal:', data.fatal);
                 
                 if (data.fatal) {
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            console.warn('Network error occurred, attempting recovery...');
+                            console.warn('Network error, attempting recovery...');
                             if (retryCount < maxRetries) {
                                 retryCount++;
                                 setTimeout(() => {
-                                    console.log(`Retry attempt ${retryCount} of ${maxRetries}`);
+                                    console.log(`Retry ${retryCount}/${maxRetries}`);
                                     this.hls.startLoad();
                                 }, 1000 * retryCount);
                             } else {
-                                console.error('Max retries reached for network error');
-                                alert('Unable to load this channel. The stream may be geo-blocked, offline, or require special access.\n\nTry:\n1. Using a VPN\n2. Checking if the channel is available in your region\n3. Trying a different channel');
-                                this.closeModal();
+                                console.error('Network error - max retries reached');
+                                const shouldRetry = confirm(
+                                    `Unable to load "${name}"\n\n` +
+                                    `This channel may be:\n` +
+                                    `• Geo-blocked (restricted to certain countries)\n` +
+                                    `• Temporarily offline\n` +
+                                    `• Requiring special access\n\n` +
+                                    `Click OK to try again, or Cancel to close.`
+                                );
+                                if (shouldRetry) {
+                                    retryCount = 0;
+                                    this.hls.destroy();
+                                    this.playChannel(url, name, group);
+                                } else {
+                                    this.closeModal();
+                                }
                             }
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
-                            console.warn('Media error occurred, attempting recovery...');
+                            console.warn('Media error, attempting recovery...');
                             if (retryCount < maxRetries) {
                                 retryCount++;
                                 this.hls.recoverMediaError();
                             } else {
-                                console.error('Max retries reached for media error');
-                                alert('Unable to play this channel. The media format may be incompatible.');
+                                console.error('Media error - max retries reached');
+                                alert(`Unable to play "${name}"\n\nThe stream format may be incompatible with your browser.\n\nTry using a different browser or VPN.`);
                                 this.closeModal();
                             }
                             break;
                         default:
-                            console.error('Fatal streaming error:', data.details);
-                            alert('Unable to play this channel. The stream may be unavailable or offline.\n\nError: ' + data.details);
+                            console.error('Fatal error:', data.details);
+                            alert(`Unable to play "${name}"\n\nError: ${data.details}\n\nThe stream may be offline or unavailable.`);
                             this.closeModal();
                             break;
                     }
@@ -400,41 +434,45 @@ class IPTVManager {
             });
         } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
             // Native HLS support (Safari)
-            console.log('Using native HLS support for:', name);
-            videoPlayer.src = url;
+            console.log('Using native HLS for:', name);
+            videoPlayer.src = streamUrl;
             videoPlayer.load();
             
             videoPlayer.onerror = (e) => {
-                console.error('Native player error:', e, videoPlayer.error);
+                console.error('Native player error:', videoPlayer.error);
                 const error = videoPlayer.error;
                 if (error) {
-                    let errorMsg = 'Unable to play this channel.\n\n';
+                    let errorMsg = `Unable to play "${name}"\n\n`;
                     switch (error.code) {
                         case error.MEDIA_ERR_ABORTED:
-                            errorMsg += 'Playback aborted.';
+                            errorMsg += 'Playback was aborted.';
                             break;
                         case error.MEDIA_ERR_NETWORK:
-                            errorMsg += 'Network error. The stream may be geo-blocked or offline.';
+                            errorMsg += 'Network error. Stream may be geo-blocked or offline.\n\nTry using a VPN or different browser.';
                             break;
                         case error.MEDIA_ERR_DECODE:
-                            errorMsg += 'Media decoding error.';
+                            errorMsg += 'Media decoding error. Format may be incompatible.';
                             break;
                         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMsg += 'Stream format not supported or source not found.';
+                            errorMsg += 'Stream format not supported or unavailable.';
                             break;
                         default:
                             errorMsg += 'Unknown error occurred.';
                     }
-                    alert(errorMsg);
-                    this.closeModal();
+                    
+                    const shouldRetry = confirm(errorMsg + '\n\nClick OK to retry, or Cancel to close.');
+                    if (shouldRetry) {
+                        videoPlayer.load();
+                        videoPlayer.play().catch(err => console.warn('Retry failed:', err));
+                    } else {
+                        this.closeModal();
+                    }
                 }
             };
             
             videoPlayer.play().catch(error => {
-                // Silently handle auto-play restrictions
                 if (error.name !== 'NotAllowedError') {
                     console.warn('Playback error:', error.message);
-                    alert('Unable to start playback. Error: ' + error.message);
                 }
             });
         } else {
