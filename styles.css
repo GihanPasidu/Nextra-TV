@@ -281,6 +281,27 @@ body {
     margin-bottom: 3rem;
 }
 
+/* Load More Button */
+.load-more-btn {
+    grid-column: 1 / -1;
+    padding: 1rem 2rem;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 1rem;
+}
+
+.load-more-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 .channel-card {
     background: var(--surface);
     border: 1px solid var(--border-color);
@@ -291,6 +312,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
+    will-change: transform;
 }
 
 .channel-card:hover {
@@ -316,10 +338,24 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    /* Optimize rendering */
+    will-change: transform;
 }
 
-.channel-card:hover .channel-thumb img {
-    transform: scale(1.05);
+/* Hide broken image icons */
+.channel-thumb img[src]:not([src=""]):not([src*="data:"]) {
+    image-rendering: auto;
+}
+
+.channel-thumb img::before {
+    content: none;
+}
+
+/* Only animate on hover for visible cards */
+@media (hover: hover) {
+    .channel-card:hover .channel-thumb img {
+        transform: scale(1.05);
+    }
 }
 
 .channel-thumb-icon {
