@@ -7,6 +7,7 @@ class IPTVManager {
         this.searchQuery = '';
         this.m3uUrl = 'https://iptv-org.github.io/iptv/index.m3u';
         this.hls = null; // HLS.js instance
+        this.isGitHubPages = window.location.hostname.includes('github.io');
         this.init();
     }
 

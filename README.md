@@ -5,6 +5,9 @@ A modern, high-performance IPTV streaming platform built with vanilla JavaScript
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-green.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
+![Deploy](https://github.com/GihanPasidu/Nextra-TV/workflows/Deploy%20to%20GitHub%20Pages/badge.svg)
+
+**🌐 Live Demo:** [https://gihanpasidu.github.io/Nextra-TV/](https://gihanpasidu.github.io/Nextra-TV/)
 
 ## ✨ Features
 
@@ -52,7 +55,7 @@ A modern, high-performance IPTV streaming platform built with vanilla JavaScript
 
 ## 📦 Installation
 
-### Quick Start
+### Quick Start (Local)
 
 1. **Clone the repository**
    ```bash
@@ -79,6 +82,46 @@ A modern, high-performance IPTV streaming platform built with vanilla JavaScript
    ```
    Open http://localhost:8000 in your browser
    ```
+
+### 🚀 Deploy to GitHub Pages (Recommended)
+
+Deploying to GitHub Pages can help resolve CORS issues and improve stream compatibility!
+
+#### Option 1: Automatic Deployment (Recommended)
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Deploy Nextra TV"
+   git push origin main
+   ```
+
+2. **Enable GitHub Pages**
+   - Go to your repository on GitHub
+   - Click **Settings** → **Pages**
+   - Under **Source**, select **GitHub Actions**
+   - The site will automatically deploy when you push to `main`
+
+3. **Access your live site**
+   ```
+   https://YOUR-USERNAME.github.io/Nextra-TV/
+   ```
+
+#### Option 2: Manual GitHub Pages Setup
+
+1. Go to **Settings** → **Pages**
+2. Under **Source**, select **Deploy from a branch**
+3. Select branch **main** and folder **/ (root)**
+4. Click **Save**
+5. Wait 2-3 minutes for deployment
+6. Visit: `https://YOUR-USERNAME.github.io/Nextra-TV/`
+
+#### Why GitHub Pages Helps:
+- ✅ **HTTPS by default** - More streams work with secure connections
+- ✅ **Better CORS handling** - Reduced cross-origin issues
+- ✅ **CDN delivery** - Faster loading worldwide
+- ✅ **Free hosting** - No cost, no server maintenance
+- ✅ **Automatic updates** - Push code, site updates automatically
 
 ### No Build Required! 🎉
 This is a pure vanilla JavaScript project with no dependencies or build process needed.
@@ -187,12 +230,16 @@ Edit `script.js` lines 320-344 for advanced HLS settings like:
 **Common reasons:**
 - **Geo-blocking**: Channel restricted to specific countries
   - *Solution*: Use VPN to appropriate country
+  - *Solution*: Deploy on GitHub Pages (HTTPS helps with some geo-blocks)
 - **Stream Offline**: Channel temporarily unavailable
   - *Solution*: Try another channel
 - **CORS Issues**: Server blocking browser requests
-  - *Solution*: Cannot be fixed client-side
+  - *Solution*: Deploy on GitHub Pages for better CORS handling
+  - *Solution*: Use HTTPS instead of HTTP (GitHub Pages provides this)
 - **Format Issues**: Incompatible stream format
   - *Solution*: Try different browser
+
+**💡 Pro Tip:** Many streams work better when the site is deployed on GitHub Pages with HTTPS!
 
 ### Console Errors
 The application now handles errors gracefully:

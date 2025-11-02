@@ -19,3 +19,7 @@ build/
 # Environment
 .env
 .env.local
+
+# Keep these files for GitHub Pages
+!.nojekyll
+!.github/
