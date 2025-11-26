@@ -5,9 +5,11 @@ class IPTVManager {
         this.filteredChannels = [];
         this.currentFilter = 'all';
         this.searchQuery = '';
+        // Using the full channel list with better coverage
         this.m3uUrl = 'https://iptv-org.github.io/iptv/index.m3u';
         this.hls = null; // HLS.js instance
         this.isGitHubPages = window.location.hostname.includes('github.io');
+        this.attemptedProxy = false;
         this.init();
     }
 
@@ -296,7 +298,7 @@ class IPTVManager {
         }
     }
 
-    playChannel(url, name, group) {
+    playChannel(url, name, group, useCorsProxy = false) {
         const modal = document.getElementById('playerModal');
         const videoPlayer = document.getElementById('videoPlayer');
         const modalChannelName = document.getElementById('modalChannelName');
@@ -315,40 +317,50 @@ class IPTVManager {
         // Show modal
         modal.style.display = 'flex';
 
-        // For problematic streams, try with CORS proxy first
-        let streamUrl = url;
-        const useCorsProxy = false; // Set to true if direct access fails
+        // Detect sports and other potentially problematic channels
+        const isSportsChannel = group.toLowerCase().includes('sport') || 
+                               name.toLowerCase().includes('sport') ||
+                               name.toLowerCase().includes('espn') ||
+                               name.toLowerCase().includes('sony') ||
+                               name.toLowerCase().includes('ten sports') ||
+                               name.toLowerCase().includes('sky sports') ||
+                               name.toLowerCase().includes('bein') ||
+                               name.toLowerCase().includes('fox sports');
         
-        // If stream has known CORS issues, enable proxy
-        if (url.includes('sonyliv') || url.includes('sonyten') || 
-            name.toLowerCase().includes('sony') || 
-            name.toLowerCase().includes('ten sports')) {
-            // These streams often have CORS issues, but try direct first
-            console.log('Detected potentially geo-blocked stream:', name);
+        // Use CORS proxy for sports channels or if explicitly requested
+        let streamUrl = url;
+        if (useCorsProxy || isSportsChannel) {
+            streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+            console.log('Using CORS proxy for:', name);
         }
+        
+        console.log('Playing channel:', name, 'Group:', group, 'URL:', streamUrl);
 
         // Check if HLS is supported
         if (Hls.isSupported()) {
             // Use HLS.js for browsers that don't natively support HLS
+            // Optimized config for live sports streaming
             this.hls = new Hls({
                 debug: false,
                 enableWorker: true,
-                lowLatencyMode: false,
+                lowLatencyMode: true, // Better for live sports
                 backBufferLength: 90,
                 maxBufferLength: 30,
                 maxMaxBufferLength: 600,
                 maxBufferSize: 60 * 1000 * 1000,
                 maxBufferHole: 0.5,
-                manifestLoadingTimeOut: 20000,
-                manifestLoadingMaxRetry: 6,
+                highBufferWatchdogPeriod: 3,
+                nudgeMaxRetry: 5,
+                manifestLoadingTimeOut: 30000,
+                manifestLoadingMaxRetry: 10,
                 manifestLoadingRetryDelay: 1000,
                 manifestLoadingMaxRetryTimeout: 64000,
-                levelLoadingTimeOut: 20000,
-                levelLoadingMaxRetry: 6,
+                levelLoadingTimeOut: 30000,
+                levelLoadingMaxRetry: 10,
                 levelLoadingRetryDelay: 1000,
                 levelLoadingMaxRetryTimeout: 64000,
-                fragLoadingTimeOut: 30000,
-                fragLoadingMaxRetry: 10,
+                fragLoadingTimeOut: 40000,
+                fragLoadingMaxRetry: 15,
                 fragLoadingRetryDelay: 1000,
                 fragLoadingMaxRetryTimeout: 64000,
                 startFragPrefetch: true,
@@ -358,11 +370,17 @@ class IPTVManager {
                 stretchShortVideoTrack: true,
                 maxAudioFramesDrift: 1,
                 forceKeyFrameOnDiscontinuity: true,
+                abrEwmaDefaultEstimate: 500000,
                 // Handle CORS - try without credentials
                 xhrSetup: function(xhr, url) {
                     xhr.withCredentials = false;
-                    // Add referrer policy for some geo-blocked content
-                    xhr.setRequestHeader('Referer', '');
+                    // Try to bypass some geo-restrictions
+                    try {
+                        xhr.setRequestHeader('Origin', window.location.origin);
+                    } catch (e) {
+                        // Some browsers don't allow setting Origin
+                        console.log('Cannot set Origin header');
+                    }
                 }
             });
 
@@ -374,6 +392,12 @@ class IPTVManager {
 
             this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
                 console.log('Stream loaded successfully:', name);
+                // Set quality level for better sports streaming
+                if (this.hls.levels.length > 1) {
+                    // Start with a medium quality for faster loading
+                    const midLevel = Math.floor(this.hls.levels.length / 2);
+                    this.hls.currentLevel = midLevel;
+                }
                 videoPlayer.play().catch(error => {
                     // Silently handle auto-play restrictions
                     if (error.name !== 'NotAllowedError') {
@@ -397,20 +421,30 @@ class IPTVManager {
                                 }, 1000 * retryCount);
                             } else {
                                 console.error('Network error - max retries reached');
-                                const shouldRetry = confirm(
-                                    `Unable to load "${name}"\n\n` +
-                                    `This channel may be:\n` +
-                                    `• Geo-blocked (restricted to certain countries)\n` +
-                                    `• Temporarily offline\n` +
-                                    `• Requiring special access\n\n` +
-                                    `Click OK to try again, or Cancel to close.`
-                                );
-                                if (shouldRetry) {
+                                
+                                // Try with CORS proxy if not already using it
+                                if (!useCorsProxy) {
+                                    console.log('Retrying with CORS proxy...');
                                     retryCount = 0;
                                     this.hls.destroy();
-                                    this.playChannel(url, name, group);
+                                    this.playChannel(url, name, group, true);
                                 } else {
-                                    this.closeModal();
+                                    const shouldRetry = confirm(
+                                        `Unable to load "${name}"\n\n` +
+                                        `This channel may be:\n` +
+                                        `• Geo-blocked (restricted to certain countries)\n` +
+                                        `• Temporarily offline\n` +
+                                        `• Requiring special access\n\n` +
+                                        `Try using a VPN or different browser.\n\n` +
+                                        `Click OK to try again, or Cancel to close.`
+                                    );
+                                    if (shouldRetry) {
+                                        retryCount = 0;
+                                        this.hls.destroy();
+                                        this.playChannel(url, name, group, false);
+                                    } else {
+                                        this.closeModal();
+                                    }
                                 }
                             }
                             break;
