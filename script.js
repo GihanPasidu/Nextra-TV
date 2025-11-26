@@ -10,6 +10,9 @@ class IPTVManager {
         this.hls = null; // HLS.js instance
         this.isGitHubPages = window.location.hostname.includes('github.io');
         this.attemptedProxy = false;
+        this.attemptedProxyIndex = -1;
+        this.forceProxySetting = false; // User-controlled proxy toggle
+        this.currentPlaying = null; // {url, name, group}
         this.init();
     }
 
@@ -60,6 +63,56 @@ class IPTVManager {
         loadingBtn.addEventListener('click', () => {
             this.loadChannels();
         });
+
+        // Proxy toggle in modal
+        const proxyToggle = document.getElementById('proxyToggle');
+        if (proxyToggle) {
+            proxyToggle.addEventListener('change', (e) => {
+                this.forceProxySetting = e.target.checked;
+                const indicator = document.getElementById('proxyIndicator');
+                if (indicator) {
+                    indicator.style.display = e.target.checked ? 'inline-block' : 'none';
+                }
+                // If modal is visible and a channel is playing, reattempt playback with new setting
+                const modal = document.getElementById('playerModal');
+                if (modal && modal.style.display === 'flex' && this.currentPlaying) {
+                    // Restart playback using the new setting
+                    this.playChannel(this.currentPlaying.url, this.currentPlaying.name, this.currentPlaying.group, this.forceProxySetting);
+                }
+            });
+        }
+
+        // Retry button
+        const retryProxyBtn = document.getElementById('retryProxyBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const copyUrlBtn = document.getElementById('copyUrlBtn');
+        if (retryProxyBtn) {
+            retryProxyBtn.addEventListener('click', () => {
+                if (this.currentPlaying) {
+                    this.playChannel(this.currentPlaying.url, this.currentPlaying.name, this.currentPlaying.group, true);
+                }
+            });
+        }
+        if (retryBtn) {
+            retryBtn.addEventListener('click', () => {
+                if (this.currentPlaying) {
+                    this.playChannel(this.currentPlaying.url, this.currentPlaying.name, this.currentPlaying.group, false);
+                }
+            });
+        }
+        if (copyUrlBtn) {
+            copyUrlBtn.addEventListener('click', () => {
+                if (this.currentPlaying) {
+                    const proxies = ['https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
+                    const forced = this.forceProxySetting;
+                    let urlToCopy = this.currentPlaying.url;
+                    if (forced) urlToCopy = proxies[0] + encodeURIComponent(urlToCopy);
+                    navigator.clipboard && navigator.clipboard.writeText(urlToCopy).then(() => {
+                        alert('Stream URL copied to clipboard');
+                    }).catch(() => { alert('Unable to copy to clipboard'); });
+                }
+            });
+        }
     }
 
     async loadChannels() {
@@ -298,7 +351,7 @@ class IPTVManager {
         }
     }
 
-    playChannel(url, name, group, useCorsProxy = false) {
+    async playChannel(url, name, group, useCorsProxy = false, proxyIndex = -1) {
         const modal = document.getElementById('playerModal');
         const videoPlayer = document.getElementById('videoPlayer');
         const modalChannelName = document.getElementById('modalChannelName');
@@ -317,6 +370,12 @@ class IPTVManager {
         // Show modal
         modal.style.display = 'flex';
 
+        // Update proxy toggle and indicator state in the modal
+        const proxyToggleEl = document.getElementById('proxyToggle');
+        const proxyIndicatorEl = document.getElementById('proxyIndicator');
+        if (proxyToggleEl) proxyToggleEl.checked = this.forceProxySetting || useCorsProxy;
+        if (proxyIndicatorEl) proxyIndicatorEl.style.display = (this.forceProxySetting || useCorsProxy) ? 'inline-block' : 'none';
+
         // Detect sports and other potentially problematic channels
         const isSportsChannel = group.toLowerCase().includes('sport') || 
                                name.toLowerCase().includes('sport') ||
@@ -327,14 +386,31 @@ class IPTVManager {
                                name.toLowerCase().includes('bein') ||
                                name.toLowerCase().includes('fox sports');
         
-        // Use CORS proxy for sports channels or if explicitly requested
+        // Setup proxies for fallback - prioritize direct, fallback to proxy(s)
+        const proxies = [
+            'https://corsproxy.io/?',
+            'https://api.allorigins.win/raw?url='
+        ];
+
+        // Determine whether the user forced proxy usage or not
+        const forcedProxy = useCorsProxy || this.forceProxySetting;
+
+        // Build stream URL based on proxy preferences (prefer direct unless forced)
         let streamUrl = url;
-        if (useCorsProxy || isSportsChannel) {
-            streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-            console.log('Using CORS proxy for:', name);
+        let usedProxyIndex = -1; // -1 indicates no proxy used
+        if (forcedProxy) {
+            const idx = proxyIndex >= 0 ? proxyIndex : 0;
+            streamUrl = proxies[idx] + encodeURIComponent(url);
+            usedProxyIndex = idx;
+            console.log('Forcing CORS proxy (index', idx, ') for:', name);
         }
+        // Reset our attempted-proxy flag for this playback session and track proxy index
+        this.attemptedProxy = false;
+        this.attemptedProxyIndex = usedProxyIndex;
         
         console.log('Playing channel:', name, 'Group:', group, 'URL:', streamUrl);
+        const modalProxyInfoInit = document.getElementById('modalProxyInfo');
+        if (modalProxyInfoInit) modalProxyInfoInit.textContent = forcedProxy ? `Using Proxy Index: ${usedProxyIndex}` : 'Direct Connection';
 
         // Check if HLS is supported
         if (Hls.isSupported()) {
@@ -374,13 +450,7 @@ class IPTVManager {
                 // Handle CORS - try without credentials
                 xhrSetup: function(xhr, url) {
                     xhr.withCredentials = false;
-                    // Try to bypass some geo-restrictions
-                    try {
-                        xhr.setRequestHeader('Origin', window.location.origin);
-                    } catch (e) {
-                        // Some browsers don't allow setting Origin
-                        console.log('Cannot set Origin header');
-                    }
+                    // Intentionally avoid setting Origin/Referer to reduce request rejection
                 }
             });
 
@@ -404,6 +474,46 @@ class IPTVManager {
                         console.warn('Playback error:', error.message);
                     }
                 });
+                // Clear any modal error messages on successful parse and update proxy info
+                this.clearModalError();
+                const modalProxyInfo = document.getElementById('modalProxyInfo');
+                if (modalProxyInfo) modalProxyInfo.textContent = forcedProxy ? `Using Proxy Index: ${usedProxyIndex}` : 'Direct Connection';
+            });
+
+            // If we're forcing proxy playback or attempting proxy fallback, rewrite frag URLs to use the proxy as well
+            this.hls.on(Hls.Events.FRAG_LOADING, (event, data) => {
+                const proxyToUse = (forcedProxy && usedProxyIndex >= 0) ? proxies[usedProxyIndex] : (this.attemptedProxy && this.attemptedProxyIndex >= 0 ? proxies[this.attemptedProxyIndex] : null);
+                if (proxyToUse && data && data.frag && data.frag.url) {
+                    try {
+                        // Build absolute frag URL in case it's relative using streamUrl as base
+                        const base = streamUrl || url;
+                        const absoluteFragUrl = new URL(data.frag.url, base).href;
+                        data.frag.url = proxyToUse + encodeURIComponent(absoluteFragUrl);
+                        console.log('Proxying frag URL ->', data.frag.url);
+                    } catch (err) {
+                        // Fall back to encoding as-is if new URL fails
+                        data.frag.url = proxyToUse + encodeURIComponent(data.frag.url);
+                        console.log('Proxying frag URL (fallback) ->', data.frag.url);
+                    }
+                }
+            });
+
+            // Also patch level fragments when a level is loaded
+            this.hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+                const proxyToUse = (forcedProxy && usedProxyIndex >= 0) ? proxies[usedProxyIndex] : (this.attemptedProxy && this.attemptedProxyIndex >= 0 ? proxies[this.attemptedProxyIndex] : null);
+                if (proxyToUse && data && data.details && data.details.fragments) {
+                    data.details.fragments.forEach(f => {
+                        if (f && f.url) {
+                            try {
+                                const base = streamUrl || url;
+                                const absoluteUrl = new URL(f.url, base).href;
+                                f.url = proxyToUse + encodeURIComponent(absoluteUrl);
+                            } catch (err) {
+                                f.url = proxyToUse + encodeURIComponent(f.url);
+                            }
+                        }
+                    });
+                }
             });
 
             this.hls.on(Hls.Events.ERROR, (event, data) => {
@@ -421,21 +531,38 @@ class IPTVManager {
                                 }, 1000 * retryCount);
                             } else {
                                 console.error('Network error - max retries reached');
-                                
-                                // Try with CORS proxy if not already using it
-                                if (!useCorsProxy) {
-                                    console.log('Retrying with CORS proxy...');
+                                // If this was a sports channel, and we haven't tried a proxy yet, retry using the CORS proxy
+                                if (isSportsChannel && !forcedProxy && !this.attemptedProxy) {
+                                    console.log('Attempting playback with CORS proxy because initial direct playback failed.');
+                                    this.showModalError(`Network error: ${data.details || data.type}. Retrying with proxy...`);
+                                    const modalProxyInfo = document.getElementById('modalProxyInfo');
+                                    if (modalProxyInfo) modalProxyInfo.textContent = 'Trying Proxy Index: 0';
+                                    this.attemptedProxy = true;
+                                    this.attemptedProxyIndex = 0;
                                     retryCount = 0;
                                     this.hls.destroy();
-                                    this.playChannel(url, name, group, true);
+                                    this.playChannel(url, name, group, true, 0);
+                                } else if (isSportsChannel && forcedProxy && this.attemptedProxy && this.attemptedProxyIndex === 0) {
+                                    // We tried the first proxy; attempt the alternative proxy index if available
+                                    console.log('Retrying with alternative proxy (index 1)');
+                                    this.showModalError(`Network error: ${data.details || data.type}. Trying alternative proxy...`);
+                                    const modalProxyInfo2 = document.getElementById('modalProxyInfo');
+                                    if (modalProxyInfo2) modalProxyInfo2.textContent = 'Trying Proxy Index: 1';
+                                    retryCount = 0;
+                                    this.hls.destroy();
+                                    this.attemptedProxyIndex = 1;
+                                    this.playChannel(url, name, group, true, 1);
                                 } else {
+                                    this.showModalError(`Unable to play: ${data.details || data.type}`);
+                                    const modalProxyInfo3 = document.getElementById('modalProxyInfo');
+                                    if (modalProxyInfo3) modalProxyInfo3.textContent = forcedProxy ? `Tried Proxy Index: ${this.attemptedProxyIndex}` : 'Direct Connection (no proxy)';
                                     const shouldRetry = confirm(
                                         `Unable to load "${name}"\n\n` +
                                         `This channel may be:\n` +
                                         `• Geo-blocked (restricted to certain countries)\n` +
                                         `• Temporarily offline\n` +
                                         `• Requiring special access\n\n` +
-                                        `Try using a VPN or different browser.\n\n` +
+                                        `Try using a VPN, toggle "Use CORS Proxy" and try again, or use a different browser.\n\n` +
                                         `Click OK to try again, or Cancel to close.`
                                     );
                                     if (shouldRetry) {
@@ -470,8 +597,44 @@ class IPTVManager {
         } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
             // Native HLS support (Safari)
             console.log('Using native HLS for:', name);
-            videoPlayer.src = streamUrl;
-            videoPlayer.load();
+            // If a proxy should be used, fetch the playlist through the proxy, rewrite URLs, and create a Blob URL for native playback
+            if (forcedProxy || this.attemptedProxy) {
+                const pIndex = forcedProxy && usedProxyIndex >= 0 ? usedProxyIndex : (this.attemptedProxyIndex >= 0 ? this.attemptedProxyIndex : 0);
+                const proxyEndpoint = proxies[pIndex] || proxies[0];
+                try {
+                    const manifestResp = await fetch(proxyEndpoint + encodeURIComponent(url));
+                    if (manifestResp.ok) {
+                        let manifestText = await manifestResp.text();
+                        manifestText = manifestText.split('\n').map(line => {
+                            if (line && !line.startsWith('#')) {
+                                try {
+                                    const absoluteUrl = new URL(line, url).href;
+                                    return proxyEndpoint + encodeURIComponent(absoluteUrl);
+                                } catch (err) {
+                                    return proxyEndpoint + encodeURIComponent(line);
+                                }
+                            }
+                            return line;
+                        }).join('\n');
+                        const blob = new Blob([manifestText], { type: 'application/x-mpegURL' });
+                        if (this.currentBlobUrl) URL.revokeObjectURL(this.currentBlobUrl);
+                        this.currentBlobUrl = URL.createObjectURL(blob);
+                        videoPlayer.src = this.currentBlobUrl;
+                        videoPlayer.load();
+                    } else {
+                        console.warn('Failed to fetch manifest via proxy: ', manifestResp.status);
+                        videoPlayer.src = streamUrl;
+                        videoPlayer.load();
+                    }
+                } catch (err) {
+                    console.warn('Failed to fetch/patch manifest for native playback:', err);
+                    videoPlayer.src = streamUrl;
+                    videoPlayer.load();
+                }
+            } else {
+                videoPlayer.src = streamUrl;
+                videoPlayer.load();
+            }
             
             videoPlayer.onerror = (e) => {
                 console.error('Native player error:', videoPlayer.error);
@@ -495,6 +658,26 @@ class IPTVManager {
                             errorMsg += 'Unknown error occurred.';
                     }
                     
+                    // If it's a network error and sports channel, try the proxy fallback before prompting the user
+                    if (error.code === error.MEDIA_ERR_NETWORK && isSportsChannel && !forcedProxy && !this.attemptedProxy) {
+                        console.log('Native player network error - retrying with proxy...');
+                        this.showModalError(`Network error in native player. Retrying with proxy...`);
+                        this.attemptedProxy = true;
+                        const proxySrc = proxies && proxies.length ? proxies[0] + encodeURIComponent(url) : null;
+                        if (proxySrc) {
+                            this.attemptedProxyIndex = 0;
+                            videoPlayer.src = proxySrc;
+                            videoPlayer.load();
+                            videoPlayer.play().catch(err => console.warn('Proxy retry failed:', err));
+                            return;
+                        }
+                    }
+
+                    // Show error in modal
+                    this.showModalError(errorMsg);
+                    const modalProxyInfo = document.getElementById('modalProxyInfo');
+                    if (modalProxyInfo) modalProxyInfo.textContent = forcedProxy ? `Using Proxy Index: ${usedProxyIndex}` : 'Direct Connection';
+
                     const shouldRetry = confirm(errorMsg + '\n\nClick OK to retry, or Cancel to close.');
                     if (shouldRetry) {
                         videoPlayer.load();
@@ -529,6 +712,22 @@ class IPTVManager {
         videoPlayer.pause();
         videoPlayer.src = '';
 
+        // Reset any proxy attempt state for next playback
+        this.attemptedProxy = false;
+        this.attemptedProxyIndex = -1;
+
+        // Reset proxy indicator in the modal
+        const indicator = document.getElementById('proxyIndicator');
+        if (indicator) indicator.style.display = this.forceProxySetting ? 'inline-block' : 'none';
+        const modalProxyInfo = document.getElementById('modalProxyInfo');
+        if (modalProxyInfo) modalProxyInfo.textContent = '';
+
+        // Revoke any blob URL created for native playback
+        if (this.currentBlobUrl) {
+            try { URL.revokeObjectURL(this.currentBlobUrl); } catch(e) {}
+            this.currentBlobUrl = null;
+        }
+
         // Hide modal
         modal.style.display = 'none';
     }
@@ -536,6 +735,24 @@ class IPTVManager {
     updateChannelCount(count) {
         const channelCount = document.getElementById('channelCount');
         channelCount.textContent = count;
+    }
+
+    showModalError(message) {
+        const modalError = document.getElementById('modalError');
+        const modalErrorText = document.getElementById('modalErrorText');
+        if (modalError && modalErrorText) {
+            modalErrorText.textContent = message;
+            modalError.style.display = 'block';
+        }
+    }
+
+    clearModalError() {
+        const modalError = document.getElementById('modalError');
+        const modalErrorText = document.getElementById('modalErrorText');
+        if (modalError && modalErrorText) {
+            modalErrorText.textContent = '';
+            modalError.style.display = 'none';
+        }
     }
 
     escapeHtml(text) {

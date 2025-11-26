@@ -88,6 +88,19 @@
             <div class="channel-info">
                 <h2 id="modalChannelName"></h2>
                 <p id="modalChannelGroup"></p>
+                <div class="proxy-controls">
+                    <label class="proxy-toggle">
+                        <input id="proxyToggle" type="checkbox"> Use CORS Proxy
+                    </label>
+                    <button id="retryProxyBtn" class="retry-btn">Retry With Proxy</button>
+                    <button id="retryBtn" class="retry-btn">Retry</button>
+                    <button id="copyUrlBtn" class="retry-btn">Copy Stream URL</button>
+                    <span id="proxyIndicator" class="proxy-indicator" style="display:none;">Using Proxy</span>
+                </div>
+                <div id="modalError" class="modal-error" style="display:none; margin-top:0.5rem;">
+                    <p id="modalErrorText" style="font-size:0.9rem; color: var(--danger);"></p>
+                    <p id="modalProxyInfo" style="font-size:0.85rem; color:var(--text-secondary);"></p>
+                </div>
             </div>
         </div>
     </div>

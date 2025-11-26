@@ -143,6 +143,7 @@ This is a pure vanilla JavaScript project with no dependencies or build process 
 1. Click any channel card
 2. Video player modal opens
 3. Stream starts automatically (if browser allows)
+   - In the player modal, you can enable the **Use CORS Proxy** toggle to force playback via a CORS proxy when a stream is geo-blocked or otherwise blocked by CORS rules (useful for some sports streams).
 4. Click X or outside modal to close
 
 ### Category Filters
